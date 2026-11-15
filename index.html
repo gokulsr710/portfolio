@@ -530,7 +530,7 @@ function render(){
     out.push(`<section id="classes"><div class="wrap">${head("classes", "Classes & Moments")}
       ${gc.length > 2 ? `<div class="filters rv">${gc.map(c => `<button data-gf="${esc(c)}" class="${c === galFilter ? "on" : ""}">${esc(c)}</button>`).join("")}</div>` : ""}
       <div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous photos">‹</button><div class="gal" id="rollTrack">${s.gallery.filter(x => galFilter === "All" || x.category === galFilter).map(x =>
-        `<figure data-lb="${esc(img(x.image, x.caption))}" data-cap="${esc(x.caption)}"><img draggable="false" src="${esc(img(x.image, x.caption))}" alt="${esc(x.caption)}"><figcaption><small>${esc(x.category)}</small>${esc(x.caption)}</figcaption></figure>`).join("")}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
+        `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" src="${esc(img(x.image, "add photo"))}" alt="${esc(x.caption)}">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join("")}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
     </div></section>`);
   }
 
@@ -608,6 +608,20 @@ document.addEventListener("pointerdown", e => { const t = e.target.closest("#rol
 document.addEventListener("pointermove", e => { if(!drag) return; const dx = e.clientX - drag.x; if(Math.abs(dx) > 5){ dragged = true; drag.t.classList.add("drag"); } drag.t.scrollLeft = drag.s - dx; });
 document.addEventListener("pointerup", () => { if(!drag) return; drag.t.classList.remove("drag"); drag = null; setTimeout(() => dragged = false, 0); });
 addEventListener("touchstart", e => { if(e.target.closest("#rollTrack")) rollHold = Date.now() + 4000; }, {passive: true});
+
+/* click sound: a short relay-style tick on anything clickable */
+let actx;
+function tick(){
+  try{
+    actx ||= new (window.AudioContext || window.webkitAudioContext)();
+    if(actx.state === "suspended") actx.resume();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = "square"; o.frequency.setValueAtTime(1900, t); o.frequency.exponentialRampToValueAtTime(420, t + .045);
+    g.gain.setValueAtTime(.07, t); g.gain.exponentialRampToValueAtTime(.0001, t + .06);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + .07);
+  }catch(e){}
+}
+document.addEventListener("click", e => { if(e.target.closest("a,button,summary,select,label.btn,[data-lb],input[type=range]")) tick(); }, true);
 
 /* typed roles */
 let ti = 0, tc = 0, tdel = false;
