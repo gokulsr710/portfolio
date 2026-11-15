@@ -97,7 +97,7 @@ section{padding:84px 0;position:relative;z-index:1}
 .audc{display:grid;grid-template-columns:auto 1fr;column-gap:14px;align-items:center;padding:16px 18px;color:var(--text);transition:border-color .2s,transform .2s}
 .audc:hover{border-color:var(--neon);transform:translateY(-3px)}
 .audc svg{grid-row:1/3;width:30px;height:30px;fill:none;stroke:var(--neon);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.audc b{font-size:24px;line-height:1.15;font-weight:600}
+.audc b{font-size:22px;line-height:1.2;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .audc b i{font-style:normal;font-size:13px;color:var(--mute);font-weight:400;margin-left:4px}
 .audc em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -111,12 +111,9 @@ section{padding:84px 0;position:relative;z-index:1}
 .reel .meta small{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--neon);margin-bottom:4px;font-weight:400}
 .reel .meta svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-.igbox{margin:36px auto 0;max-width:540px;text-align:center}
-.igbox iframe{display:block;width:100%;height:570px;border:1px solid var(--line2);border-radius:14px;background:#fff;margin-bottom:14px}
-
-.reel.embed{aspect-ratio:9/16;background:#000}
-.reel.embed iframe{display:block;width:100%;height:calc(100% + 260px);margin-top:-54px;border:0;background:#000}
-.reel.embed .meta{pointer-events:none;top:74%;padding:12px 14px;background:var(--panel2);border-top:1px solid var(--line)}
+.iggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px;margin-top:38px}
+.igbox{container-type:inline-size;text-align:center;min-width:0}
+.igbox iframe{display:block;width:100%;height:calc(150px + 68cqw);border:1px solid var(--line2);border-radius:14px;background:#fff;margin-bottom:12px}
 
 /* about */
 .about-grid{display:block}
@@ -330,7 +327,7 @@ const DEFAULTS = {
     title: "Electronics Engineer & Content Creator",
     roles: "Semiconductors, Embedded Systems, Tech Content Creator",
     tagline: "I work with semiconductors and embedded systems, and I make short videos that explain electronics in plain language.",
-    photo: "", instagram: "", location: "India", email: "you@example.com", resume: ""
+    photo: "", location: "India", email: "you@example.com", resume: ""
   },
   about: {
     text: "I'm an electronics engineer working across semiconductor devices and embedded systems.\n\nAlongside the engineering, I run social media pages where I break down how chips, circuits and microcontrollers work for students and beginners. This page collects my projects, my content, the classes and workshops I've taken part in, and how to reach me."
@@ -372,10 +369,15 @@ const DEFAULTS = {
     {period: "2025", title: "Internship — Hardware Design", place: "Company Name", desc: "Designed and tested sensor interface boards; wrote test firmware in C."}
   ],
   extras: [],
+  channels: [
+    {handle: "_gr_tech_circuits"},
+    {handle: "gr.techupdates"},
+    {handle: "gr.tech.reviews"}
+  ],
   social: [
-    {handle: "@yourhandle", count: "12.4K", label: "followers", icon: "instagram", url: "https://www.instagram.com/"},
-    {handle: "Your Channel", count: "3.1K", label: "subscribers", icon: "youtube", url: "https://www.youtube.com/"},
-    {handle: "Your Name", count: "1.8K", label: "followers", icon: "linkedin", url: "https://www.linkedin.com/"}
+    {handle: "@_gr_tech_circuits", count: "6.6K", label: "followers", icon: "instagram", url: "https://www.instagram.com/_gr_tech_circuits/"},
+    {handle: "@gr.techupdates", count: "146", label: "followers", icon: "instagram", url: "https://www.instagram.com/gr.techupdates/"},
+    {handle: "@gr.tech.reviews", count: "285", label: "followers", icon: "instagram", url: "https://www.instagram.com/gr.tech.reviews/"}
   ],
   content: [
     {title: "How a transistor actually switches", platform: "instagram", views: "48K views", image: "", link: ""},
@@ -410,11 +412,14 @@ const SCHEMA = {
     {k:"name",label:"Full name"},{k:"initials",label:"Logo initials (2–3 letters)"},
     {k:"title",label:"Title"},{k:"roles",label:"Roles shown under your name (comma separated)"},
     {k:"tagline",label:"Tagline",t:"area"},{k:"photo",label:"Profile photo",t:"img"},
-    {k:"instagram",label:"Instagram page link (shows a live preview in the Content section)"},{k:"location",label:"Location"},{k:"email",label:"Email"},{k:"resume",label:"Résumé link (URL)"}]},
+    {k:"location",label:"Location"},{k:"email",label:"Email"},{k:"resume",label:"Résumé link (URL)"}]},
   about:{label:"About", fields:[{k:"text",label:"About me",t:"area",rows:9}]},
   social:{label:"Audience", list:true, blank:{handle:"@you",count:"0",label:"followers",icon:"instagram",url:"https://"},
     hint:"Follower counts shown under your introduction. The numbers are typed in by hand, so update them when they change.",
     fields:[{k:"handle",label:"Handle or page name"},{k:"count",label:"Count (e.g. 12.4K)"},{k:"label",label:"Word after the count (followers, subscribers)"},{k:"icon",label:"Platform",t:"sel",opts:Object.keys(ICONS)},{k:"url",label:"Profile link"}]},
+  channels:{label:"Channels", list:true, blank:{handle:"@yourpage"},
+    hint:"Instagram pages shown as live previews in the Content section. Works for public accounts only.",
+    fields:[{k:"handle",label:"Instagram handle or page link"}]},
   content:{label:"Content", list:true, blank:{title:"New video",platform:"instagram",views:"",image:"",link:""},
     hint:"Your reels, videos and posts. Paste an Instagram reel or post link and its thumbnail appears by itself (leave Thumbnail empty). For other platforms, upload a thumbnail. View counts are typed by hand.",
     fields:[{k:"title",label:"Title"},{k:"platform",label:"Platform",t:"sel",opts:Object.keys(ICONS)},{k:"views",label:"Views or note (e.g. 48K views)"},{k:"image",label:"Thumbnail",t:"img"},{k:"link",label:"Link to the video or post"}]},
@@ -544,7 +549,7 @@ function render(){
         <div class="chipframe"><div class="chipbody"><img src="${esc(img(p.photo, "your photo"))}" alt="${esc(p.name)}"></div></div>
       </div>
     </div>
-    ${s.social.length ? `<div class="aud">${s.social.map(x => `<a class="card audc"${safeUrl(x.url) ? ` href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener"` : ""}>${icon(x.icon)}<b>${esc(x.count)}<i>${esc(x.label)}</i></b><em>${esc(x.handle)}</em></a>`).join("")}</div>` : ""}
+    ${s.social.length ? `<div class="aud">${s.social.map(x => `<a class="card audc"${safeUrl(x.url) ? ` href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener"` : ""}>${icon(x.icon)}<b>${x.count ? `${esc(x.count)}<i>${esc(x.label)}</i>` : esc(x.handle)}</b><em>${x.count ? esc(x.handle) : "View page"}</em></a>`).join("")}</div>` : ""}
   </div></section>`);
 
   /* about */
@@ -579,13 +584,13 @@ function render(){
   }
 
   /* content */
-  const ig = igUser(p.instagram);
-  if(s.content.length || ig){
+  const chans = s.channels.map(c => igUser(c.handle)).filter(Boolean);
+  if(s.content.length || chans.length){
     nav.push(["content", "Content"]);
     out.push(`<section id="content"><div class="wrap">${head("content", "Content")}
       ${s.content.length ? `<div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous">‹</button><div class="gal">${s.content.map(x =>
         reelCard(x)).join("")}</div><button class="rb r" data-roll="1" aria-label="Next">›</button></div>` : ""}
-      ${ig ? `<div class="igbox rv"><iframe src="https://www.instagram.com/${esc(ig)}/embed/" title="Instagram preview" loading="lazy" scrolling="no" frameborder="0"></iframe><a class="btn sm" href="https://www.instagram.com/${esc(ig)}/" target="_blank" rel="noopener">${icon("instagram")} Open @${esc(ig)} on Instagram</a></div>` : ""}
+      ${chans.length ? `<div class="iggrid">${chans.map(ig => `<div class="igbox rv"><iframe src="https://www.instagram.com/${esc(ig)}/embed/" title="Instagram preview of ${esc(ig)}" loading="lazy" scrolling="no" frameborder="0"></iframe><a class="btn sm" href="https://www.instagram.com/${esc(ig)}/" target="_blank" rel="noopener">${icon("instagram")} @${esc(ig)}</a></div>`).join("")}</div>` : ""}
     </div></section>`);
   }
 
