@@ -87,8 +87,17 @@ section{padding:84px 0;position:relative;z-index:1}
 .sec-head .wire{flex:1;height:2px;background:linear-gradient(90deg,var(--line2),transparent)}
 .sec-head svg{width:64px;height:20px;flex:none;stroke:var(--copper);fill:none;stroke-width:2}
 @media(max-width:560px){.sec-head h2{white-space:normal}.sec-head svg{display:none}}
-.rv{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}
-.rv.in{opacity:1;transform:none}
+.rv{opacity:0;transform:translateY(40px) scale(.97);filter:blur(7px);transition:opacity .75s,transform .75s cubic-bezier(.2,.7,.2,1),filter .75s}
+.rv.in{opacity:1;transform:none;filter:none}
+:is(.chips,.grid3,.stats,.tl)>.rv:nth-child(2){transition-delay:.1s}
+:is(.chips,.grid3,.stats,.tl)>.rv:nth-child(3){transition-delay:.2s}
+:is(.chips,.grid3,.stats,.tl)>.rv:nth-child(n+4){transition-delay:.3s}
+.sec-head .wire{transform:scaleX(0);transform-origin:left;transition:transform 1s .25s}
+.sec-head.in .wire{transform:none}
+#wipe{position:fixed;inset:0;z-index:45;pointer-events:none;background:var(--bg);transform:translateY(102%);border-top:3px solid var(--neon);border-bottom:3px solid var(--neon);box-shadow:0 0 70px rgba(255,122,24,.55);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;letter-spacing:.3em;text-transform:uppercase;color:var(--neon)}
+#wipe{visibility:hidden}
+#wipe.go{visibility:visible;animation:wipe .8s cubic-bezier(.7,0,.3,1)}
+@keyframes wipe{0%{transform:translateY(102%)}42%,58%{transform:none}100%{transform:translateY(-102%)}}
 .card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;position:relative}
 
 /* about */
@@ -112,13 +121,10 @@ section{padding:84px 0;position:relative;z-index:1}
 .ic::before{left:-12px}.ic::after{right:-12px}
 .ic h3{margin:0 0 16px;font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--neon);font-weight:500;display:flex;justify-content:space-between;gap:10px}
 .ic h3 span{color:var(--mute)}
-.sk{margin-bottom:13px}
-.sk-top{display:flex;justify-content:space-between;font-size:15.5px;margin-bottom:5px}
-.sk-top span{font-family:var(--mono);font-size:12px;color:var(--mute)}
-.bar{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
-.bar i{height:8px;border-radius:2px;background:#2a1d13}
-.bar i.on{background:var(--neon);box-shadow:0 0 8px rgba(255,122,24,.6)}
-.bar i.on:nth-child(n+8){background:var(--amber);box-shadow:0 0 8px rgba(255,209,102,.6)}
+.sklist{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:9px}
+.sklist li{display:flex;align-items:center;gap:9px;font-size:15.5px;padding:7px 13px;border:1px solid var(--line2);border-radius:7px;background:#0b0806;transition:.2s}
+.sklist li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 9px var(--neon);flex:none}
+.sklist li:hover{border-color:var(--neon);transform:translateY(-2px)}
 
 /* projects */
 .grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:24px}
@@ -277,6 +283,7 @@ body.adm-open .adm{transform:none}
 <div id="links"></div>
 <footer><div class="wrap" id="foot"></div></footer>
 
+<div id="wipe" aria-hidden="true"><span></span></div>
 <div class="ov" id="lb"><div><img alt=""><p></p></div></div>
 
 <div class="ov" id="gate"><form class="card gatebox" id="gateForm" autocomplete="off">
@@ -323,15 +330,15 @@ const DEFAULTS = {
     {value: "3.3V", label: "Logic level"}
   ],
   skills: [
-    {name: "Circuit Design & Analysis", category: "Electronics", level: 90},
-    {name: "PCB Design (KiCad / Altium)", category: "Electronics", level: 80},
-    {name: "Power Electronics", category: "Electronics", level: 75},
-    {name: "Arduino / ESP32", category: "Embedded", level: 90},
-    {name: "STM32 / ARM Cortex-M", category: "Embedded", level: 70},
-    {name: "PLC & SCADA", category: "Embedded", level: 65},
-    {name: "C / C++", category: "Programming", level: 85},
-    {name: "Python", category: "Programming", level: 80},
-    {name: "MATLAB / Simulink", category: "Programming", level: 75}
+    {name: "Circuit Design & Analysis", category: "Electronics"},
+    {name: "PCB Design (KiCad / Altium)", category: "Electronics"},
+    {name: "Power Electronics", category: "Electronics"},
+    {name: "Arduino / ESP32", category: "Embedded"},
+    {name: "STM32 / ARM Cortex-M", category: "Embedded"},
+    {name: "PLC & SCADA", category: "Embedded"},
+    {name: "C / C++", category: "Programming"},
+    {name: "Python", category: "Programming"},
+    {name: "MATLAB / Simulink", category: "Programming"}
   ],
   projects: [
     {title: "Smart Energy Meter", desc: "IoT energy monitor that measures voltage, current and power factor in real time and pushes data to a web dashboard.", tags: "ESP32, IoT, Power", image: "", link: ""},
@@ -380,8 +387,8 @@ const SCHEMA = {
     {k:"location",label:"Location"},{k:"email",label:"Email"},{k:"resume",label:"Résumé link (URL)"}]},
   about:{label:"About", fields:[{k:"text",label:"About me",t:"area",rows:9},{k:"status",label:"Status line (shown in code card)"}]},
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
-  skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics",level:70},
-    fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"},{k:"level",label:"Level",t:"range"}]},
+  skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
+    fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
   projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",link:""},
     fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Image",t:"img"},{k:"link",label:"Link (URL)"}]},
   gallery:{label:"Classes & Photos", list:true, blank:{caption:"New photo",category:"Classes",image:""},
@@ -506,8 +513,7 @@ function render(){
     const groups = {}; s.skills.forEach(x => (groups[x.category || "General"] ||= []).push(x));
     out.push(`<section id="skills"><div class="wrap">${head("skills", "Skills")}<div class="chips">${
       Object.entries(groups).map(([c, items], i) => `<div class="card ic rv"><h3>${esc(c)}<span>IC-${String(i + 1).padStart(2, "0")}</span></h3>${
-        items.map(x => {const n = Math.round((+x.level || 0) / 10);
-          return `<div class="sk"><div class="sk-top">${esc(x.name)}<span>${+x.level || 0}%</span></div><div class="bar">${Array.from({length: 10}, (_, j) => `<i class="${j < n ? "on" : ""}"></i>`).join("")}</div></div>`;}).join("")
+        `<ul class="sklist">${items.map(x => `<li>${esc(x.name)}</li>`).join("")}</ul>`
       }</div>`).join("")}</div></div></section>`);
   }
 
@@ -575,7 +581,7 @@ function render(){
 let io;
 function observe(){
   const instant = document.body.classList.contains("adm-open") || matchMedia("(prefers-reduced-motion: reduce)").matches;
-  io ||= new IntersectionObserver(es => es.forEach(e => {if(e.isIntersecting){e.target.classList.add("in"); io.unobserve(e.target);}}), {threshold: .12});
+  io ||= new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle("in", e.isIntersecting)), {threshold: .08});
   $$(".rv").forEach(el => instant ? el.classList.add("in") : io.observe(el));
 }
 
@@ -592,7 +598,19 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => {if(e.key === "Escape"){ $("#lb").classList.remove("open"); $("#gate").classList.remove("open"); }});
 function route(){ const on = location.hash === "#links"; document.body.classList.toggle("links-mode", on); if(on) scrollTo(0, 0); }
-addEventListener("hashchange", route);
+addEventListener("hashchange", route); addEventListener("popstate", route);
+/* section transition: a wipe sweeps over the page while it jumps to the chosen section */
+let wipeT;
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]'); if(!a) return;
+  const h = a.getAttribute("href"), go = () => { history.pushState(null, "", h); route(); if(h !== "#links"){ const el = $(h); if(el) el.scrollIntoView({behavior: "instant"}); } };
+  e.preventDefault();
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){ go(); return; }
+  const w = $("#wipe"); w.firstChild.textContent = "> " + (h === "#top" ? "home" : h.slice(1));
+  w.classList.remove("go"); void w.offsetWidth; w.classList.add("go");
+  clearTimeout(wipeT); wipeT = setTimeout(go, 360);
+  w.onanimationend = () => w.classList.remove("go");
+});
 
 /* rolling photo strip: rolls by itself, pauses on hover, drag or use arrows to slide */
 let rollDir = 1, rollHold = 0, rollTarget = null, drag = null, dragged = false;
