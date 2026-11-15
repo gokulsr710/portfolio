@@ -107,6 +107,8 @@ section{padding:84px 0;position:relative;z-index:1}
 .igbox iframe{display:block;width:100%;height:calc(150px + 68cqw);border:1px solid var(--line2);border-radius:14px;background:#fff;margin-bottom:12px}
 
 
+.igbox.yt iframe{height:auto;aspect-ratio:16/9;background:#000}
+
 /* about */
 .about-grid{display:block}
 .about-text{white-space:pre-line;color:#d8c9bb;max-width:68ch;font-size:18px;margin:0}
@@ -364,7 +366,8 @@ const DEFAULTS = {
   channels: [
     {handle: "_gr_tech_circuits"},
     {handle: "gr.techupdates"},
-    {handle: "gr.tech.reviews"}
+    {handle: "gr.tech.reviews"},
+    {handle: "https://www.youtube.com/@gr.tech.circuits", ytid: "UCji_XckwXrO8ZcSYMCVvCfg"}
   ],
   social: [
     {handle: "@_gr_tech_circuits", count: "6.6K", label: "followers", icon: "instagram", url: "https://www.instagram.com/_gr_tech_circuits/"},
@@ -403,8 +406,8 @@ const SCHEMA = {
     hint:"Follower counts shown under your introduction. The numbers are typed in by hand, so update them when they change.",
     fields:[{k:"handle",label:"Handle or page name"},{k:"count",label:"Count (e.g. 12.4K)"},{k:"label",label:"Word after the count (followers, subscribers)"},{k:"icon",label:"Platform",t:"sel",opts:Object.keys(ICONS)},{k:"url",label:"Profile link"}]},
   channels:{label:"Channels", list:true, blank:{handle:"@yourpage"},
-    hint:"Instagram pages shown as live previews in the Channels section. Works for public accounts only.",
-    fields:[{k:"handle",label:"Instagram handle or page link"}]},
+    hint:"Instagram pages and YouTube channels shown as live previews in the Channels section. Instagram works for public accounts only. A YouTube channel also needs its channel ID (on YouTube: your channel page, More, Share channel, Copy channel ID).",
+    fields:[{k:"handle",label:"Instagram handle, or page / channel link"},{k:"ytid",label:"YouTube channel ID (starts with UC, YouTube only)"}]},
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
@@ -448,6 +451,19 @@ function wafer(){
     }
   }
   return `<svg class="wafer" viewBox="0 0 520 520" aria-hidden="true"><circle cx="${C}" cy="${C}" r="${R}" fill="rgba(201,138,82,.04)" stroke="rgba(201,138,82,.55)" stroke-width="1.5"/><g stroke="rgba(201,138,82,.4)" stroke-width="1">${cells}</g><path d="M${C - 26} ${C + R - 1}h52" stroke="#070504" stroke-width="5"/></svg>`;
+}
+/* One channel preview: Instagram profile embed, or a YouTube channel's uploads player (shows the latest video's thumbnail). */
+function chanCard(c){
+  const h = String(c.handle || "").trim(), btn = (url, ic, label) => `<a class="btn sm" href="${esc(url)}" target="_blank" rel="noopener">${icon(ic)} ${esc(label)}</a>`;
+  if(/youtu\.?be/i.test(h) || c.ytid){
+    const id = (String(c.ytid || "").match(/UC[\w-]{22}/) || h.match(/UC[\w-]{22}/) || [""])[0];
+    const url = /youtu\.?be/i.test(h) ? safeUrl(h) : (id ? "https://www.youtube.com/channel/" + id : "");
+    if(!url) return "";
+    const name = (h.match(/@([\w.-]+)/) || [])[1];
+    return `<div class="igbox yt rv">${id ? `<iframe src="https://www.youtube.com/embed/videoseries?list=UU${esc(id.slice(2))}" title="YouTube channel preview" loading="lazy" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` : ""}${btn(url, "youtube", name ? "@" + name : "YouTube channel")}</div>`;
+  }
+  const ig = igUser(h);
+  return ig ? `<div class="igbox rv"><iframe src="https://www.instagram.com/${esc(ig)}/embed/" title="Instagram preview of ${esc(ig)}" loading="lazy" scrolling="no" frameborder="0"></iframe>${btn("https://www.instagram.com/" + ig + "/", "instagram", "@" + ig)}</div>` : "";
 }
 function igUser(v){
   v = String(v || "").trim();
@@ -553,11 +569,11 @@ function render(){
   }
 
   /* channels */
-  const chans = s.channels.map(c => igUser(c.handle)).filter(Boolean);
+  const chans = s.channels.map(chanCard).filter(Boolean);
   if(chans.length){
     nav.push(["channels", "Channels"]);
     out.push(`<section id="channels"><div class="wrap">${head("channels", "Channels")}
-      <div class="iggrid">${chans.map(ig => `<div class="igbox rv"><iframe src="https://www.instagram.com/${esc(ig)}/embed/" title="Instagram preview of ${esc(ig)}" loading="lazy" scrolling="no" frameborder="0"></iframe><a class="btn sm" href="https://www.instagram.com/${esc(ig)}/" target="_blank" rel="noopener">${icon("instagram")} @${esc(ig)}</a></div>`).join("")}</div>
+      <div class="iggrid">${chans.join("")}</div>
     </div></section>`);
   }
 
