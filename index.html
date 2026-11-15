@@ -604,7 +604,7 @@ function render(){
     out.push(`<section id="classes"><div class="wrap">${head("classes", "Classes & Workshops")}
       ${gc.length > 2 ? `<div class="filters rv">${gc.map(c => `<button data-gf="${esc(c)}" class="${c === galFilter ? "on" : ""}">${esc(c)}</button>`).join("")}</div>` : ""}
       <div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous photos">‹</button><div class="gal">${s.gallery.filter(x => galFilter === "All" || x.category === galFilter).map(x =>
-        `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" src="${esc(img(x.image, "add photo"))}" alt="${esc(x.caption)}">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join("")}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
+        `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" loading="lazy"${x.w && x.h ? ` width="${+x.w}" height="${+x.h}"` : ""} src="${esc(img(x.image, "add photo"))}" alt="">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join("")}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
     </div></section>`);
   }
 
