@@ -101,27 +101,11 @@ section{padding:84px 0;position:relative;z-index:1}
 .audc b i{font-style:normal;font-size:13px;color:var(--mute);font-weight:400;margin-left:4px}
 .audc em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* content reels */
-.reel{flex:0 0 auto;height:clamp(300px,36vw,420px);position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--panel);color:#fff;display:block;transition:transform .35s,opacity .35s,border-color .35s}
-.reel img{height:100%;width:auto;max-width:none;pointer-events:none}
-.gal:hover .reel{opacity:.55;transform:scale(.98)}
-.gal:hover .reel:hover{opacity:1;transform:scale(1.04);border-color:var(--neon);z-index:2}
-.reel .play{position:absolute;top:50%;left:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(7,5,4,.65);border:1px solid rgba(255,255,255,.5);display:grid;place-items:center;font-size:17px;padding-left:3px}
-.reel .meta{position:absolute;left:0;right:0;bottom:0;padding:44px 14px 13px;background:linear-gradient(transparent,rgba(4,3,2,.94));font-size:15px;font-weight:500;line-height:1.3}
-.reel .meta small{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--neon);margin-bottom:4px;font-weight:400}
-.reel .meta svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-
-.iggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px;margin-top:38px}
+/* channels */
+.iggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px}
 .igbox{container-type:inline-size;text-align:center;min-width:0}
 .igbox iframe{display:block;width:100%;height:calc(150px + 68cqw);border:1px solid var(--line2);border-radius:14px;background:#fff;margin-bottom:12px}
 
-.reel.embed{width:calc(clamp(300px,36vw,420px) - 92px);background:#000}
-.reel.embed iframe{display:block;width:100%;height:calc(100% + 260px);margin-top:-54px;border:0;background:#000}
-.reel.embed .meta{pointer-events:none;height:93px;padding:12px 14px;background:var(--panel2);border-top:1px solid var(--line)}
-/* a reel: Instagram letterboxes the 9:16 video in a 4:5 box, so the player is enlarged and shifted until the video fills a 2:3 card */
-.reel.embed.tall{--h:clamp(300px,36vw,420px);width:calc(var(--h) * .6667)}
-.reel.embed.tall iframe{width:calc(var(--h) * .9481);max-width:none;margin-left:calc(var(--h) * -.1407);margin-top:calc(-54px - var(--h) * .0927);height:calc(var(--h) * 1.3 + 70px)}
-.reel.embed.tall .meta{height:auto;padding:44px 14px 13px;background:linear-gradient(transparent,rgba(4,3,2,.94));border-top:0}
 
 /* about */
 .about-grid{display:block}
@@ -387,7 +371,6 @@ const DEFAULTS = {
     {handle: "@gr.techupdates", count: "146", label: "followers", icon: "instagram", url: "https://www.instagram.com/gr.techupdates/"},
     {handle: "@gr.tech.reviews", count: "285", label: "followers", icon: "instagram", url: "https://www.instagram.com/gr.tech.reviews/"}
   ],
-  content: [],
   links: [
     {label: "LinkedIn", url: "https://www.linkedin.com/", icon: "linkedin"},
     {label: "Instagram", url: "https://www.instagram.com/", icon: "instagram"},
@@ -420,11 +403,8 @@ const SCHEMA = {
     hint:"Follower counts shown under your introduction. The numbers are typed in by hand, so update them when they change.",
     fields:[{k:"handle",label:"Handle or page name"},{k:"count",label:"Count (e.g. 12.4K)"},{k:"label",label:"Word after the count (followers, subscribers)"},{k:"icon",label:"Platform",t:"sel",opts:Object.keys(ICONS)},{k:"url",label:"Profile link"}]},
   channels:{label:"Channels", list:true, blank:{handle:"@yourpage"},
-    hint:"Instagram pages shown as live previews in the Content section. Works for public accounts only.",
+    hint:"Instagram pages shown as live previews in the Channels section. Works for public accounts only.",
     fields:[{k:"handle",label:"Instagram handle or page link"}]},
-  content:{label:"Content", list:true, blank:{title:"New video",platform:"instagram",views:"",image:"",link:""},
-    hint:"Your reels, videos and posts. Paste an Instagram reel or post link and its thumbnail appears by itself (leave Thumbnail empty). For other platforms, upload a thumbnail. View counts are typed by hand.",
-    fields:[{k:"title",label:"Title"},{k:"platform",label:"Platform",t:"sel",opts:Object.keys(ICONS)},{k:"views",label:"Views or note (e.g. 48K views)"},{k:"image",label:"Thumbnail",t:"img"},{k:"link",label:"Link to the video or post"}]},
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
@@ -458,9 +438,6 @@ function safeUrl(u){
 function ph(label){
   return "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'><rect width='600' height='400' fill='#140e09'/><g stroke='#4a3018' stroke-width='2' fill='none'><path d='M0 300h140l40-40h120l40 40h260M80 0v90l50 50h150M600 120H470l-40 40H330M420 400v-70l-30-30'/></g><g fill='#140e09' stroke='#c98a52' stroke-width='3'><circle cx='280' cy='140' r='7'/><circle cx='330' cy='160' r='7'/><circle cx='390' cy='300' r='7'/><circle cx='180' cy='260' r='7'/></g><text x='300' y='212' fill='#ff7a18' font-family='monospace' font-size='20' text-anchor='middle'>${esc(label)}</text></svg>`);
 }
-function phTall(label){
-  return "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 640'><rect width='360' height='640' fill='#140e09'/><g stroke='#4a3018' stroke-width='2' fill='none'><path d='M0 120h110l40 40h210M60 640V500l50-50h120M360 380H250l-40-40H90M300 0v70l-40 40'/></g><g fill='#140e09' stroke='#c98a52' stroke-width='3'><circle cx='150' cy='160' r='7'/><circle cx='230' cy='450' r='7'/><circle cx='90' cy='340' r='7'/></g><text x='180' y='250' fill='#ff7a18' font-family='monospace' font-size='18' text-anchor='middle'>${esc(label)}</text></svg>`);
-}
 function wafer(){
   const R = 250, C = 260, step = 30, d = 25; let cells = "";
   for(let i = 0; i < 18; i++) for(let j = 0; j < 18; j++){
@@ -471,16 +448,6 @@ function wafer(){
     }
   }
   return `<svg class="wafer" viewBox="0 0 520 520" aria-hidden="true"><circle cx="${C}" cy="${C}" r="${R}" fill="rgba(201,138,82,.04)" stroke="rgba(201,138,82,.55)" stroke-width="1.5"/><g stroke="rgba(201,138,82,.4)" stroke-width="1">${cells}</g><path d="M${C - 26} ${C + R - 1}h52" stroke="#070504" stroke-width="5"/></svg>`;
-}
-function igPost(u){
-  const m = String(u || "").match(/instagram\.com\/(?:[A-Za-z0-9._]+\/)?(reel|reels|p|tv)\/([A-Za-z0-9_-]+)/i);
-  return m ? (m[1].toLowerCase() === "p" ? "p" : "reel") + "/" + m[2] : "";
-}
-/* A content card. An Instagram reel/post link with no uploaded thumbnail shows Instagram's own player, so the thumbnail comes from Instagram. */
-function reelCard(x){
-  const meta = `<span class="meta"><small>${icon(x.platform)}${esc(x.views)}</small>${esc(x.title)}</span>`, ig = !x.image && igPost(x.link);
-  if(ig) return `<div class="reel embed${ig.startsWith("reel/") ? " tall" : ""}"><iframe src="https://www.instagram.com/${ig}/embed/" title="${esc(x.title)}" scrolling="no" frameborder="0"></iframe>${meta}</div>`;
-  return `<a class="reel" draggable="false"${safeUrl(x.link) ? ` href="${esc(safeUrl(x.link))}" target="_blank" rel="noopener"` : ""}><img draggable="false" src="${esc(x.image ? img(x.image) : phTall("add thumbnail"))}" alt=""><span class="play">▶</span>${meta}</a>`;
 }
 function igUser(v){
   v = String(v || "").trim();
@@ -585,14 +552,12 @@ function render(){
       </div></article>`).join("")}</div></div></section>`);
   }
 
-  /* content */
+  /* channels */
   const chans = s.channels.map(c => igUser(c.handle)).filter(Boolean);
-  if(s.content.length || chans.length){
-    nav.push(["content", "Content"]);
-    out.push(`<section id="content"><div class="wrap">${head("content", "Content")}
-      ${s.content.length ? `<div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous">‹</button><div class="gal">${s.content.map(x =>
-        reelCard(x)).join("")}</div><button class="rb r" data-roll="1" aria-label="Next">›</button></div>` : ""}
-      ${chans.length ? `<div class="iggrid">${chans.map(ig => `<div class="igbox rv"><iframe src="https://www.instagram.com/${esc(ig)}/embed/" title="Instagram preview of ${esc(ig)}" loading="lazy" scrolling="no" frameborder="0"></iframe><a class="btn sm" href="https://www.instagram.com/${esc(ig)}/" target="_blank" rel="noopener">${icon("instagram")} @${esc(ig)}</a></div>`).join("")}</div>` : ""}
+  if(chans.length){
+    nav.push(["channels", "Channels"]);
+    out.push(`<section id="channels"><div class="wrap">${head("channels", "Channels")}
+      <div class="iggrid">${chans.map(ig => `<div class="igbox rv"><iframe src="https://www.instagram.com/${esc(ig)}/embed/" title="Instagram preview of ${esc(ig)}" loading="lazy" scrolling="no" frameborder="0"></iframe><a class="btn sm" href="https://www.instagram.com/${esc(ig)}/" target="_blank" rel="noopener">${icon("instagram")} @${esc(ig)}</a></div>`).join("")}</div>
     </div></section>`);
   }
 
