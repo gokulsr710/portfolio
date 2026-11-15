@@ -7,14 +7,14 @@
 <meta name="description" content="Portfolio of an Electrical and Electronics Engineer: projects, skills, classes and links.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#070504; --panel:#110c08; --panel2:#1a120b; --line:#2c1f15; --line2:#4a3220;
   --copper:#c98a52; --neon:#ff7a18; --amber:#ffd166; --red:#ff5d6c;
   --text:#f3e9df; --mute:#a39182;
-  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
-  --mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --display:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:84px}
@@ -24,7 +24,7 @@ a{color:var(--neon);text-decoration:none}
 img{max-width:100%;display:block}
 button{font:inherit;color:inherit;cursor:pointer}
 ::selection{background:var(--neon);color:#1a0a00}
-#bgc{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.9}
+#bgc{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.55}
 .wrap{width:min(1160px,100% - 40px);margin-inline:auto;position:relative;z-index:1}
 
 /* ---------- nav ---------- */
@@ -32,18 +32,17 @@ button{font:inherit;color:inherit;cursor:pointer}
 .nav .wrap{display:flex;align-items:center;gap:22px;height:66px}
 #logo{display:flex;align-items:center;gap:10px;background:none;border:0;padding:4px;user-select:none;-webkit-tap-highlight-color:transparent}
 #logo svg{width:44px;height:44px;transition:filter .2s,transform .15s}
-#logo:hover svg{filter:drop-shadow(0 0 8px var(--neon))}
 #logo:active svg{transform:scale(.93)}
 #logo b{font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--mute);font-weight:500}
 .navlinks{display:flex;gap:4px;margin-left:auto}
 .navlinks a{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);padding:8px 11px;border-radius:6px;transition:.2s}
 .navlinks a:hover{color:var(--neon);background:rgba(255,122,24,.07)}
 .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:12px 20px;border-radius:8px;border:1px solid var(--neon);color:var(--neon);background:rgba(255,122,24,.06);transition:.2s;position:relative}
-.btn:hover{background:var(--neon);color:#1a0a00;box-shadow:0 0 26px rgba(255,122,24,.45)}
+.btn:hover{background:var(--neon);color:#1a0a00}
 .btn.solid{background:var(--neon);color:#1a0a00;font-weight:700}
-.btn.solid:hover{box-shadow:0 0 34px rgba(255,122,24,.6)}
+.btn.solid:hover{filter:brightness(1.1)}
 .btn.copper{border-color:var(--copper);color:var(--copper);background:rgba(201,138,82,.06)}
-.btn.copper:hover{background:var(--copper);color:#1a0f00;box-shadow:0 0 26px rgba(201,138,82,.45)}
+.btn.copper:hover{background:var(--copper);color:#1a0f00}
 .btn.sm{padding:7px 12px;font-size:11.5px;border-radius:6px}
 .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:860px){.navlinks{display:none}.nav .btn{margin-left:auto}}
@@ -52,13 +51,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:110px 0 30px}
 .hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:56px;align-items:center}
 .boot{font-family:var(--mono);font-size:13px;color:var(--mute);display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.led{width:9px;height:9px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:blink 1.6s infinite}
-@keyframes blink{50%{opacity:.25}}
-h1{font-size:clamp(44px,7.4vw,92px);line-height:1;margin:0 0 18px;font-weight:700;letter-spacing:-.01em;text-wrap:balance;
-  background:linear-gradient(100deg,#fff 20%,var(--neon) 60%,var(--copper));-webkit-background-clip:text;background-clip:text;color:transparent}
-.role{font-family:var(--mono);font-size:clamp(15px,2vw,20px);color:var(--amber);min-height:1.7em}
-.role i{color:var(--mute);font-style:normal}
-.caret{display:inline-block;width:.6em;height:1.1em;background:var(--amber);vertical-align:-.18em;margin-left:3px;animation:blink 1s steps(1) infinite}
+h1{font-size:clamp(40px,6.4vw,78px);line-height:1.05;margin:0 0 14px;font-weight:600;letter-spacing:-.02em;text-wrap:balance;color:#fff}
+.roles{color:var(--neon);font-size:clamp(16px,1.9vw,20px);margin:0;font-weight:500}
 .tagline{color:#cdbcac;max-width:56ch;margin:18px 0 30px;font-size:18px}
 .cta{display:flex;flex-wrap:wrap;gap:12px}
 .chipframe{position:relative;max-width:360px;margin-inline:auto;width:100%;padding:26px}
@@ -68,16 +62,10 @@ h1{font-size:clamp(44px,7.4vw,92px);line-height:1;margin:0 0 18px;font-weight:70
   repeating-linear-gradient(90deg,var(--copper) 0 8px,transparent 8px 24px) 34px 100%/calc(100% - 68px) 18px no-repeat,
   repeating-linear-gradient(0deg,var(--copper) 0 8px,transparent 8px 24px) 0 34px/18px calc(100% - 68px) no-repeat,
   repeating-linear-gradient(0deg,var(--copper) 0 8px,transparent 8px 24px) 100% 34px/18px calc(100% - 68px) no-repeat;opacity:.85}
-.chipbody{position:relative;border-radius:14px;background:#120c08;border:1px solid var(--line2);overflow:hidden;box-shadow:0 0 0 6px #1c130c,0 30px 80px -20px rgba(255,122,24,.35)}
+.chipbody{position:relative;border-radius:14px;background:#120c08;border:1px solid var(--line2);overflow:hidden;box-shadow:0 0 0 6px #1c130c}
 .chipbody img{width:100%;height:auto}
 .chipbody::after{content:"";position:absolute;top:12px;left:12px;width:12px;height:12px;border-radius:50%;border:2px solid var(--copper);background:#070504}
-.chiplabel{text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--mute);margin-top:6px}
-.scopebox{margin-top:54px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(#0f0a07,#0a0705);position:relative;overflow:hidden}
-#scope{display:block;width:100%;height:150px}
-.readout{position:absolute;top:10px;left:14px;right:14px;display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--mute);pointer-events:none}
-.readout b{color:var(--neon);font-weight:500}.readout b.a{color:var(--amber)}
-.readout span:last-child{margin-left:auto}
-@media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:34px}.chipframe{max-width:260px;order:-1}.hero{padding-top:96px}}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:34px}.chipframe{max-width:260px}.hero{padding-top:96px}}
 
 /* ---------- sections ---------- */
 section{padding:84px 0;position:relative;z-index:1}
@@ -87,30 +75,25 @@ section{padding:84px 0;position:relative;z-index:1}
 .sec-head .wire{flex:1;height:2px;background:linear-gradient(90deg,var(--line2),transparent)}
 .sec-head svg{width:64px;height:20px;flex:none;stroke:var(--copper);fill:none;stroke-width:2}
 @media(max-width:560px){.sec-head h2{white-space:normal}.sec-head svg{display:none}}
-.rv{opacity:0;transform:translateY(40px) scale(.97);filter:blur(7px);transition:opacity .75s,transform .75s cubic-bezier(.2,.7,.2,1),filter .75s}
-.rv.in{opacity:1;transform:none;filter:none}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s,transform .6s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
 :is(.chips,.grid3,.stats,.tl)>.rv:nth-child(2){transition-delay:.1s}
 :is(.chips,.grid3,.stats,.tl)>.rv:nth-child(3){transition-delay:.2s}
 :is(.chips,.grid3,.stats,.tl)>.rv:nth-child(n+4){transition-delay:.3s}
 .sec-head .wire{transform:scaleX(0);transform-origin:left;transition:transform 1s .25s}
 .sec-head.in .wire{transform:none}
-#wipe{position:fixed;inset:0;z-index:45;pointer-events:none;background:var(--bg);transform:translateY(102%);border-top:3px solid var(--neon);border-bottom:3px solid var(--neon);box-shadow:0 0 70px rgba(255,122,24,.55);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;letter-spacing:.3em;text-transform:uppercase;color:var(--neon)}
+#wipe{position:fixed;inset:0;z-index:45;pointer-events:none;background:var(--bg);transform:translateY(102%);border-top:2px solid var(--neon);border-bottom:2px solid var(--neon)}
 #wipe{visibility:hidden}
-#wipe.go{visibility:visible;animation:wipe .8s cubic-bezier(.7,0,.3,1)}
+#wipe.go{visibility:visible;animation:wipe .55s cubic-bezier(.7,0,.3,1)}
 @keyframes wipe{0%{transform:translateY(102%)}42%,58%{transform:none}100%{transform:translateY(-102%)}}
 .card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;position:relative}
 
 /* about */
-.about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:start}
-.about-text{white-space:pre-line;color:#d8c9bb;max-width:62ch}
-.code{font-family:var(--mono);font-size:13.5px;line-height:1.75;overflow:hidden}
-.code-top{display:flex;gap:7px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--mute)}
-.code-top i{width:10px;height:10px;border-radius:50%;background:var(--red)}.code-top i+i{background:var(--amber)}.code-top i+i+i{background:var(--neon);margin-right:8px}
-.code pre{margin:0;padding:18px;white-space:pre-wrap;word-break:break-word;font:inherit;color:#cdbcac}
-.k{color:#ff9d5c}.s{color:#f6d98b}.p{color:var(--neon)}.c{color:#7a6a5d}.n{color:var(--amber)}
+.about-grid{display:block}
+.about-text{white-space:pre-line;color:#d8c9bb;max-width:68ch;font-size:18px;margin:0}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:36px}
 .stat{padding:18px 20px}
-.stat b{display:block;font-family:var(--mono);font-size:34px;color:var(--amber);text-shadow:0 0 18px rgba(255,209,102,.45);line-height:1.1;font-variant-numeric:tabular-nums}
+.stat b{display:block;font-family:var(--mono);font-size:34px;color:var(--amber);line-height:1.1;font-variant-numeric:tabular-nums}
 .stat span{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
 @media(max-width:860px){.about-grid{grid-template-columns:1fr}}
 
@@ -123,13 +106,13 @@ section{padding:84px 0;position:relative;z-index:1}
 .ic h3 span{color:var(--mute)}
 .sklist{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:9px}
 .sklist li{display:flex;align-items:center;gap:9px;font-size:15.5px;padding:7px 13px;border:1px solid var(--line2);border-radius:7px;background:#0b0806;transition:.2s}
-.sklist li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 9px var(--neon);flex:none}
+.sklist li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--neon);flex:none}
 .sklist li:hover{border-color:var(--neon);transform:translateY(-2px)}
 
 /* projects */
 .grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:24px}
 .proj{overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,border-color .3s,box-shadow .3s}
-.proj:hover{transform:translateY(-6px);border-color:var(--neon);box-shadow:0 22px 50px -24px rgba(255,122,24,.5)}
+.proj:hover{transform:translateY(-6px);border-color:var(--neon)}
 .proj .ph{overflow:hidden;border-bottom:1px solid var(--line)}
 .proj .ph img{width:100%;height:auto;transition:transform .6s}
 .proj:hover .ph img{transform:scale(1.06)}
@@ -153,10 +136,10 @@ section{padding:84px 0;position:relative;z-index:1}
 .gal.drag{cursor:grabbing}
 .gal figure{flex:0 0 auto;height:clamp(200px,26vw,300px);margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);position:relative;background:var(--panel);transition:transform .35s,opacity .35s,filter .35s,box-shadow .35s,border-color .35s}
 .gal img{height:100%;width:auto;max-width:none;pointer-events:none}
-.gal:hover figure{opacity:.4;filter:saturate(.5);transform:scale(.95)}
-.gal:hover figure:hover{opacity:1;filter:none;transform:scale(1.12);z-index:2;border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 20px 60px -10px rgba(255,122,24,.55);cursor:zoom-in}
+.gal:hover figure{opacity:.55;transform:scale(.98)}
+.gal:hover figure:hover{opacity:1;filter:none;transform:scale(1.05);z-index:2;border-color:var(--neon);box-shadow:0 0 0 1px var(--neon);cursor:zoom-in}
 .rb{position:absolute;top:50%;z-index:4;width:42px;height:42px;margin-top:-21px;border-radius:50%;border:1px solid var(--neon);background:rgba(7,5,4,.85);color:var(--neon);font-size:20px;line-height:1;transition:.2s}
-.rb:hover{background:var(--neon);color:#1a0a00;box-shadow:0 0 22px rgba(255,122,24,.55)}
+.rb:hover{background:var(--neon);color:#1a0a00}
 .rb.l{left:4px}.rb.r{right:4px}
 .gal figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 11px;background:linear-gradient(transparent,rgba(4,3,2,.92));font-size:14.5px}
 .gal figcaption small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--neon)}
@@ -165,7 +148,7 @@ section{padding:84px 0;position:relative;z-index:1}
 .tl{position:relative;padding-left:38px;max-width:820px}
 .tl::before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--copper),var(--neon))}
 .tl-item{position:relative;padding:0 0 34px}
-.tl-item::before{content:"";position:absolute;left:-38px;top:5px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:3px solid var(--copper);box-shadow:0 0 0 4px var(--bg),0 0 14px rgba(201,138,82,.6)}
+.tl-item::before{content:"";position:absolute;left:-38px;top:5px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:3px solid var(--copper);box-shadow:0 0 0 4px var(--bg)}
 .tl-item time{font-family:var(--mono);font-size:12.5px;color:var(--amber);letter-spacing:.08em}
 .tl-item h3{margin:2px 0 0;font-size:21px;font-weight:600}
 .tl-item .pl{color:var(--neon);font-size:15px}
@@ -181,8 +164,8 @@ section{padding:84px 0;position:relative;z-index:1}
 
 /* contact */
 .contact{text-align:center;padding:100px 0 60px}
-.contact h2{font-size:clamp(34px,6vw,68px);line-height:1.05;margin:0 0 16px;font-weight:700;text-wrap:balance}
-.contact h2 em{font-style:normal;color:var(--neon);text-shadow:0 0 30px rgba(255,122,24,.5)}
+.contact h2{font-size:clamp(30px,4.6vw,52px);line-height:1.05;margin:0 0 16px;font-weight:700;text-wrap:balance}
+.contact h2 em{font-style:normal;color:var(--neon)}
 .contact p{color:var(--mute);margin:0 auto 30px;max-width:50ch}
 .contact .cta{justify-content:center}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-family:var(--mono);font-size:12px;color:var(--mute);text-align:center;position:relative;z-index:1}
@@ -192,7 +175,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-family:var(--mo
 body.links-mode main,body.links-mode footer{display:none}
 body.links-mode #links{display:block}
 .lk{width:min(520px,100% - 36px);margin:0 auto;text-align:center}
-.lk .ava{width:fit-content;max-width:100%;height:140px;margin:0 auto 16px;border-radius:22px;overflow:hidden;border:2px solid var(--copper);box-shadow:0 0 0 6px #1c130c,0 0 40px rgba(255,122,24,.35)}
+.lk .ava{width:fit-content;max-width:100%;height:140px;margin:0 auto 16px;border-radius:22px;overflow:hidden;border:2px solid var(--copper);box-shadow:0 0 0 6px #1c130c}
 .lk .ava img{height:100%;width:auto;max-width:none}
 .lk h1{font-size:34px;margin:0 0 4px}
 .lk .sub{font-family:var(--mono);font-size:13px;color:var(--amber);margin-bottom:8px}
@@ -201,8 +184,8 @@ body.links-mode #links{display:block}
 .lk-list a{display:flex;align-items:center;gap:14px;padding:15px 18px;border-radius:12px;border:1px solid var(--line2);background:linear-gradient(120deg,var(--panel2),var(--panel));color:var(--text);font-size:17px;font-weight:500;position:relative;overflow:hidden;transition:.25s;text-align:left;animation:pop .5s both}
 .lk-list a::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--copper);transition:.25s}
 .lk-list a::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,122,24,.16) 50%,transparent 70%);transform:translateX(-100%);transition:transform .7s}
-.lk-list a:hover{border-color:var(--neon);transform:translateX(5px);box-shadow:0 0 30px -6px rgba(255,122,24,.5)}
-.lk-list a:hover::before{background:var(--neon);box-shadow:0 0 14px var(--neon)}
+.lk-list a:hover{border-color:var(--neon);transform:translateX(5px)}
+.lk-list a:hover::before{background:var(--neon)}
 .lk-list a:hover::after{transform:translateX(100%)}
 .lk-list svg{width:24px;height:24px;stroke:var(--neon);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .lk-list .go{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--mute)}
@@ -271,7 +254,7 @@ body.adm-open .adm{transform:none}
       <g stroke="#c98a52" stroke-width="2.4" stroke-linecap="round"><path d="M16 4v6M24 4v6M32 4v6M16 38v6M24 38v6M32 38v6M4 16h6M4 24h6M4 32h6M38 16h6M38 24h6M38 32h6"/></g>
       <rect x="9" y="9" width="30" height="30" rx="5" fill="#140e09" stroke="#ff7a18" stroke-width="1.6"/>
       <circle cx="14.5" cy="14.5" r="1.6" fill="#c98a52"/>
-      <text id="logoTxt" x="24" y="29" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="12" fill="#ff7a18">EE</text>
+      <text id="logoTxt" x="24" y="29" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="700" font-size="12" fill="#ff7a18">EE</text>
     </svg>
     <b id="logoName"></b>
   </button>
@@ -288,8 +271,8 @@ body.adm-open .adm{transform:none}
 
 <div class="ov" id="gate"><form class="card gatebox" id="gateForm" autocomplete="off">
   <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
-  <h3>ACCESS PORT</h3>
-  <p>Maintenance mode · enter passkey</p>
+  <h3>ADMIN</h3>
+  <p>Enter the password to edit this site</p>
   <input type="password" id="gatePw" placeholder="••••••••" aria-label="Password">
   <button class="btn solid" type="submit" style="width:100%;justify-content:center">Unlock</button>
   <div class="msg" id="gateMsg"></div>
@@ -316,18 +299,16 @@ const DEFAULTS = {
     name: "Your Name", initials: "YN",
     title: "Electrical & Electronics Engineer",
     roles: "Electrical & Electronics Engineer, Embedded Systems Developer, PCB Designer, Power Electronics Enthusiast",
-    tagline: "I design circuits, write the firmware that brings them to life, and turn ideas into working hardware — from schematic to solder to code.",
+    tagline: "I work on embedded systems, PCB design and power electronics, and I like taking a project from the circuit diagram through to working hardware.",
     photo: "", location: "India", email: "you@example.com", resume: ""
   },
   about: {
-    text: "I'm an Electrical and Electronics Engineer who loves the point where hardware meets software.\n\nMy work covers circuit design, microcontroller programming, power systems and automation. I enjoy building things you can hold in your hand — and debugging them with an oscilloscope in one window and a code editor in the other.",
-    status: "open to opportunities"
+    text: "I'm an electrical and electronics engineer with an interest in both hardware and the code that runs on it.\n\nMost of my work is in circuit design, microcontroller programming and power systems. This page collects my projects, the classes and workshops I've taken part in, and how to reach me."
   },
   stats: [
     {value: "12+", label: "Projects built"},
     {value: "8", label: "Classes & workshops"},
-    {value: "5", label: "Certifications"},
-    {value: "3.3V", label: "Logic level"}
+    {value: "5", label: "Certifications"}
   ],
   skills: [
     {name: "Circuit Design & Analysis", category: "Electronics"},
@@ -382,10 +363,10 @@ const ICONS = {
 const SCHEMA = {
   profile:{label:"Profile", fields:[
     {k:"name",label:"Full name"},{k:"initials",label:"Logo initials (2–3 letters)"},
-    {k:"title",label:"Title"},{k:"roles",label:"Typed roles (comma separated)"},
+    {k:"title",label:"Title"},{k:"roles",label:"Roles shown under your name (comma separated)"},
     {k:"tagline",label:"Tagline",t:"area"},{k:"photo",label:"Profile photo",t:"img"},
     {k:"location",label:"Location"},{k:"email",label:"Email"},{k:"resume",label:"Résumé link (URL)"}]},
-  about:{label:"About", fields:[{k:"text",label:"About me",t:"area",rows:9},{k:"status",label:"Status line (shown in code card)"}]},
+  about:{label:"About", fields:[{k:"text",label:"About me",t:"area",rows:9}]},
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
@@ -454,7 +435,7 @@ async function load(){
    RENDER
    ===================================================================== */
 let galFilter = "All", secN = 0;
-const head = (id, title) => `<div class="sec-head rv"><span class="tag">// ${String(++secN).padStart(2, "0")}</span><h2>${esc(title)}</h2><svg viewBox="0 0 64 20"><path d="M0 10h14l4-8 7 16 7-16 7 16 7-16 4 8h14"/></svg><span class="wire"></span></div>`;
+const head = (id, title) => `<div class="sec-head rv"><h2>${esc(title)}</h2><svg viewBox="0 0 64 20"><path d="M0 10h14l4-8 7 16 7-16 7 16 7-16 4 8h14"/></svg><span class="wire"></span></div>`;
 
 function render(){
   const s = state, p = s.profile; secN = 0;
@@ -468,9 +449,9 @@ function render(){
   out.push(`<section class="hero" id="top"><div class="wrap">
     <div class="hero-grid">
       <div>
-        <div class="boot"><span class="led"></span>system.boot() → status: ONLINE${p.location ? " · " + esc(p.location) : ""}</div>
+        ${p.location ? `<div class="boot">${esc(p.location)}</div>` : ""}
         <h1>${esc(p.name)}</h1>
-        <div class="role"><i>&gt;&nbsp;</i><span id="typed"></span><span class="caret"></span></div>
+        <p class="roles">${list(p.roles).map(esc).join(" · ")}</p>
         <p class="tagline">${esc(p.tagline)}</p>
         <div class="cta">
           <a class="btn solid" href="#projects">View projects</a>
@@ -480,11 +461,7 @@ function render(){
       </div>
       <div>
         <div class="chipframe"><div class="chipbody"><img src="${esc(img(p.photo, "your photo"))}" alt="${esc(p.name)}"></div></div>
-        <div class="chiplabel">U1 · ${esc((p.initials || "EE").toUpperCase())}-${new Date().getFullYear()} · REV A</div>
       </div>
-    </div>
-    <div class="scopebox"><canvas id="scope"></canvas>
-      <div class="readout"><span>CH1 <b>5.00V</b></span><span>CH2 <b class="a">3.30V</b></span><span>TIME <b>2.00ms</b></span><span>TRIG <b>AUTO</b></span><span>● RUN</span></div>
     </div>
   </div></section>`);
 
@@ -494,15 +471,6 @@ function render(){
   out.push(`<section id="about"><div class="wrap">${head("about", "About")}
     <div class="about-grid">
       <p class="about-text rv">${esc(s.about.text)}</p>
-      <div class="card code rv"><div class="code-top"><i></i><i></i><i></i>engineer.js</div><pre><span class="c">// compiled with coffee &amp; solder fumes</span>
-<span class="k">const</span> <span class="p">engineer</span> = {
-  name: <span class="s">"${esc(p.name)}"</span>,
-  role: <span class="s">"${esc(p.title)}"</span>,
-  focus: [${cats.map(c => `<span class="s">"${esc(c)}"</span>`).join(", ")}],
-  location: <span class="s">"${esc(p.location)}"</span>,
-  status: <span class="s">"${esc(s.about.status)}"</span>,
-  voltage: <span class="n">230</span>, <span class="c">// always charged</span>
-};</pre></div>
     </div>
     ${s.stats.length ? `<div class="stats">${s.stats.map(x => `<div class="card stat rv"><b>${esc(x.value)}</b><span>${esc(x.label)}</span></div>`).join("")}</div>` : ""}
   </div></section>`);
@@ -533,7 +501,7 @@ function render(){
     nav.push(["classes", "Classes"]);
     const gc = ["All", ...new Set(s.gallery.map(x => x.category).filter(Boolean))];
     if(!gc.includes(galFilter)) galFilter = "All";
-    out.push(`<section id="classes"><div class="wrap">${head("classes", "Classes & Moments")}
+    out.push(`<section id="classes"><div class="wrap">${head("classes", "Classes & Workshops")}
       ${gc.length > 2 ? `<div class="filters rv">${gc.map(c => `<button data-gf="${esc(c)}" class="${c === galFilter ? "on" : ""}">${esc(c)}</button>`).join("")}</div>` : ""}
       <div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous photos">‹</button><div class="gal" id="rollTrack">${s.gallery.filter(x => galFilter === "All" || x.category === galFilter).map(x =>
         `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" src="${esc(img(x.image, "add photo"))}" alt="${esc(x.caption)}">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join("")}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
@@ -557,19 +525,19 @@ function render(){
   /* contact */
   nav.push(["contact", "Contact"]);
   out.push(`<section class="contact" id="contact"><div class="wrap rv">
-    <h2>Let's <em>close the circuit.</em></h2>
-    <p>Have a project, an opportunity, or just want to talk electronics? My inbox is always powered on.</p>
+    <h2>Get in touch</h2>
+    <p>For projects, opportunities or questions, email me or find me through the links below.</p>
     <div class="cta">${p.email ? `<a class="btn solid" href="${esc(safeUrl(p.email))}">${icon("mail")} ${esc(p.email)}</a>` : ""}<a class="btn" href="#links">${icon("bolt")} All my links</a></div>
   </div></section>`);
 
   $("#site").innerHTML = out.join("");
   $("#navlinks").innerHTML = nav.map(([id, l]) => `<a href="#${id}">${l}</a>`).join("");
-  $("#foot").innerHTML = `© ${new Date().getFullYear()} ${esc(p.name)} · designed at 5V, built with ⚡ and code`;
+  $("#foot").innerHTML = `© ${new Date().getFullYear()} ${esc(p.name)}`;
 
   /* links page */
   $("#links").innerHTML = `<div class="lk">
     <div class="ava"><img src="${esc(img(p.photo, "photo"))}" alt=""></div>
-    <h1>${esc(p.name)}</h1><div class="sub">&gt; ${esc(p.title)}</div>
+    <h1>${esc(p.name)}</h1><div class="sub">${esc(p.title)}</div>
     <p class="bio">${esc(p.tagline)}</p>
     <div class="lk-list">${s.links.map((l, i) => `<a href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" style="animation-delay:${i * 70}ms">${icon(l.icon)}<span>${esc(l.label)}</span><span class="go">→</span></a>`).join("")}</div>
     <a class="btn copper back" href="#top">← Back to portfolio</a>
@@ -606,9 +574,9 @@ document.addEventListener("click", e => {
   const h = a.getAttribute("href"), go = () => { history.pushState(null, "", h); route(); if(h !== "#links"){ const el = $(h); if(el) el.scrollIntoView({behavior: "instant"}); } };
   e.preventDefault();
   if(matchMedia("(prefers-reduced-motion: reduce)").matches){ go(); return; }
-  const w = $("#wipe"); w.firstChild.textContent = "> " + (h === "#top" ? "home" : h.slice(1));
+  const w = $("#wipe");
   w.classList.remove("go"); void w.offsetWidth; w.classList.add("go");
-  clearTimeout(wipeT); wipeT = setTimeout(go, 360);
+  clearTimeout(wipeT); wipeT = setTimeout(go, 250);
   w.onanimationend = () => w.classList.remove("go");
 });
 
@@ -626,16 +594,6 @@ document.addEventListener("pointerdown", e => { const t = e.target.closest("#rol
 document.addEventListener("pointermove", e => { if(!drag) return; const dx = e.clientX - drag.x; if(Math.abs(dx) > 5){ dragged = true; drag.t.classList.add("drag"); } drag.t.scrollLeft = drag.s - dx; });
 document.addEventListener("pointerup", () => { if(!drag) return; drag.t.classList.remove("drag"); drag = null; setTimeout(() => dragged = false, 0); });
 addEventListener("touchstart", e => { if(e.target.closest("#rollTrack")) rollHold = Date.now() + 4000; }, {passive: true});
-
-/* typed roles */
-let ti = 0, tc = 0, tdel = false;
-setInterval(() => {
-  const el = $("#typed"); if(!el) return;
-  const roles = list(state.profile.roles); if(!roles.length){ el.textContent = ""; return; }
-  const w = roles[ti % roles.length];
-  if(!tdel){ if(++tc > w.length + 16) tdel = true; } else { tc -= 2; if(tc <= 0){ tdel = false; tc = 0; ti++; } }
-  el.textContent = w.slice(0, Math.max(0, Math.min(tc, w.length)));
-}, 85);
 
 /* =====================================================================
    CANVAS — PCB traces with current pulses + oscilloscope
@@ -660,7 +618,7 @@ function buildTraces(){
     c.strokeStyle = "rgba(201,138,82,.13)"; c.lineWidth = 1.5; c.lineJoin = "round";
     c.beginPath(); pts.forEach((p, j) => j ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke();
     [pts[0], pts[pts.length - 1]].forEach(p => {c.beginPath(); c.arc(p[0], p[1], 3.5, 0, 7); c.fillStyle = "#070504"; c.fill(); c.strokeStyle = "rgba(201,138,82,.32)"; c.stroke();});
-    paths.push({pts, len, t: Math.random(), v: (.05 + Math.random() * .1) * 600 / len, hot: Math.random() < .55});
+    paths.push({pts, len, t: Math.random(), v: (.05 + Math.random() * .1) * 600 / len, hot: Math.random() < .3});
   }
 }
 function at(p, t){
@@ -680,26 +638,10 @@ function frame(now){
   for(const p of paths){ if(!p.hot) continue; p.t = (p.t + p.v * dt) % 1;
     for(let k = 0; k < 6; k++){ const q = at(p, Math.max(0, p.t - k * 9 / p.len));
       bctx.beginPath(); bctx.arc(q[0], q[1], 2.1 - k * .28, 0, 7); bctx.fillStyle = `rgba(255,122,24,${.85 - k * .14})`;
-      bctx.shadowColor = "#ff7a18"; bctx.shadowBlur = k ? 0 : 12; bctx.fill(); }
+      bctx.fill(); }
   }
   bctx.shadowBlur = 0;
-  drawScope(now / 1000);
   if(!still) requestAnimationFrame(frame);
-}
-function drawScope(t){
-  const c = $("#scope"); if(!c) return;
-  const dpr = Math.min(devicePixelRatio || 1, 2), W = c.clientWidth, H = c.clientHeight; if(!W) return;
-  if(c.width !== W * dpr){ c.width = W * dpr; c.height = H * dpr; }
-  const x = c.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
-  x.strokeStyle = "rgba(255,122,24,.08)"; x.lineWidth = 1; x.beginPath();
-  for(let gx = 0; gx <= W; gx += W / Math.round(W / 60)){ x.moveTo(gx, 0); x.lineTo(gx, H); }
-  for(let gy = 0; gy <= H; gy += H / 6){ x.moveTo(0, gy); x.lineTo(W, gy); }
-  x.stroke();
-  const sq = .5 + .5 * Math.sin(t * .35), mid = H * .56, A = H * .27;
-  const wave = (fn, col, lw) => { x.beginPath(); for(let px = 0; px <= W; px += 2){ const y = mid - fn(px / W * Math.PI * 9 - t * 2.4) * A; px ? x.lineTo(px, y) : x.moveTo(px, y); }
-    x.strokeStyle = col; x.lineWidth = lw; x.shadowColor = col; x.shadowBlur = 12; x.stroke(); x.shadowBlur = 0; };
-  wave(th => .55 * Math.cos(th * .5 + 1) * (.6 + .4 * Math.sin(th * 3.5)), "rgba(255,240,220,.5)", 1.4);
-  wave(th => (Math.sin(th) + sq * (Math.sin(3 * th) / 3 + Math.sin(5 * th) / 5 + Math.sin(7 * th) / 7 + Math.sin(9 * th) / 9)) * .95, "#ff7a18", 2);
 }
 let rz; addEventListener("resize", () => {clearTimeout(rz); rz = setTimeout(() => {buildTraces(); if(still) frame(0);}, 150);});
 
@@ -721,7 +663,7 @@ $("#gateForm").addEventListener("submit", e => {
     $("#gate").classList.remove("open"); openAdmin();
   } else {
     if(++fails >= 5){ lockUntil = Date.now() + 30000; fails = 0; }
-    msg.textContent = "ACCESS DENIED"; $("#gatePw").value = "";
+    msg.textContent = "Wrong password"; $("#gatePw").value = "";
     const f = $("#gateForm"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake");
   }
 });
