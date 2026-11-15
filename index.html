@@ -745,6 +745,11 @@ function renderTab(){
       <button data-act="up" data-i="${i}" title="Move up">↑</button><button data-act="down" data-i="${i}" title="Move down">↓</button><button class="del" data-act="del" data-i="${i}" title="Delete">✕</button></summary>
       <div class="in">${sc.fields.map(f => field(f, it[f.k], `${tab}.${i}.${f.k}`)).join("")}</div></details>`).join("");
     h += `<button class="btn sm solid" data-act="add">+ Add ${sc.label.replace(/s$/, "").toLowerCase()}</button>`;
+    if(tab === "gallery") h += `<hr><h4>Add many at once</h4>
+      <p class="hint">Pick several photos together. Each one becomes its own entry, captioned from its file name, in the category below. You can rename them afterwards.</p>
+      <label>Category for these photos<input type="text" id="bulkCat" value="Classes"></label>
+      <label class="btn sm solid" style="display:inline-flex;margin:0">+ Add multiple photos<input type="file" accept="image/*" multiple data-bulk hidden></label>
+      <p class="hint" id="bulkMsg" style="margin-top:10px"></p>`;
   } else h += sc.fields.map(f => field(f, state[tab][f.k], `${tab}.${f.k}`)).join("");
   b.innerHTML = h;
 }
@@ -769,6 +774,16 @@ function shrink(file){ return new Promise((res, rej) => { const r = new FileRead
   const x = c.getContext("2d"); x.fillStyle = "#0b1618"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL("image/jpeg", .85)); }; im.src = r.result; }; r.readAsDataURL(file); }); }
 adm.addEventListener("change", async e => {
   const el = e.target;
+  if(el.hasAttribute("data-bulk") && el.files.length){
+    const files = [...el.files], cat = $("#bulkCat").value.trim() || "Classes"; let ok = 0, bad = 0;
+    for(const [n, f] of files.entries()){
+      $("#bulkMsg").textContent = `Adding ${n + 1} of ${files.length}…`;
+      try{ const image = await shrink(f); state.gallery.push({caption: f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim() || "Photo", category: cat, image}); ok++; }catch(err){ bad++; }
+    }
+    openIdx = -1; renderTab(); changed();
+    $("#bulkMsg").textContent = `Added ${ok} photo${ok === 1 ? "" : "s"}${bad ? ` · ${bad} could not be read` : ""}.`;
+    return;
+  }
   if(el.dataset.img && el.files[0]){ try{ setPath(el.dataset.img, await shrink(el.files[0])); renderTab(); changed(); }catch(err){ alert("Could not read that image."); } }
   if(el.id === "imp" && el.files[0]){ try{ const d = JSON.parse(await el.files[0].text()); const keep = state.passHash; adopt(d); state.passHash = d.passHash || keep; changed(); alert("Imported."); }catch(err){ alert("That file is not a valid data.json."); } }
 });
