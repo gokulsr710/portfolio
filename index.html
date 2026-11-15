@@ -115,6 +115,10 @@ section{padding:84px 0;position:relative;z-index:1}
 .igbox{container-type:inline-size;text-align:center;min-width:0}
 .igbox iframe{display:block;width:100%;height:calc(150px + 68cqw);border:1px solid var(--line2);border-radius:14px;background:#fff;margin-bottom:12px}
 
+.reel.embed{width:calc(clamp(300px,36vw,420px) - 92px);background:#000}
+.reel.embed iframe{display:block;width:100%;height:calc(100% + 260px);margin-top:-54px;border:0;background:#000}
+.reel.embed .meta{pointer-events:none;height:93px;padding:12px 14px;background:var(--panel2);border-top:1px solid var(--line)}
+
 /* about */
 .about-grid{display:block}
 .about-text{white-space:pre-line;color:#d8c9bb;max-width:68ch;font-size:18px;margin:0}
@@ -471,7 +475,7 @@ function igPost(u){
 /* A content card. An Instagram reel/post link with no uploaded thumbnail shows Instagram's own player, so the thumbnail comes from Instagram. */
 function reelCard(x){
   const meta = `<span class="meta"><small>${icon(x.platform)}${esc(x.views)}</small>${esc(x.title)}</span>`, ig = !x.image && igPost(x.link);
-  if(ig) return `<div class="reel embed"><iframe src="https://www.instagram.com/${ig}/embed/" title="${esc(x.title)}" loading="lazy" scrolling="no" frameborder="0"></iframe>${meta}</div>`;
+  if(ig) return `<div class="reel embed"><iframe src="https://www.instagram.com/${ig}/embed/" title="${esc(x.title)}" scrolling="no" frameborder="0"></iframe>${meta}</div>`;
   return `<a class="reel" draggable="false"${safeUrl(x.link) ? ` href="${esc(safeUrl(x.link))}" target="_blank" rel="noopener"` : ""}><img draggable="false" src="${esc(x.image ? img(x.image) : phTall("add thumbnail"))}" alt=""><span class="play">▶</span>${meta}</a>`;
 }
 function igUser(v){
