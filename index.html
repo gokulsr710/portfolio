@@ -284,6 +284,13 @@ body:has(#power){overflow:hidden}
 #power.go .pw-d2{fill:#b6f24a;filter:drop-shadow(0 0 4px #a3e635) drop-shadow(0 0 8px #a3e635)}
 .pw-scr text{font-family:var(--mono);fill:#d9f1ff;filter:drop-shadow(0 0 2px rgba(140,205,255,.7))}
 .pw-blink{animation:blink 1s steps(1) infinite}
+.pw-guy rect{fill:#d9f1ff}
+.pw-guy{filter:drop-shadow(0 0 2px rgba(140,205,255,.7))}
+.pw-wa{animation:wa .6s steps(1) infinite}
+.pw-wb{animation:wb .6s steps(1) infinite}
+@keyframes wa{50%{opacity:0}}
+@keyframes wb{0%{opacity:0}50%{opacity:1}}
+#power.go .pw-guy{display:none}
 @keyframes blink{50%{opacity:0}}
 .pw-bar{display:none}
 #power.go .pw-bar{display:inline}
@@ -402,13 +409,14 @@ body:has(#power){overflow:hidden}
     <rect x="72" y="104" width="186" height="110" rx="3" fill="#050608" stroke="#2a2f36"/>
     <g class="pw-scr">
       <rect x="80" y="112" width="170" height="88" fill="#000"/>
-      <text id="pwL1" x="90" y="142" font-size="22" font-weight="700"></text>
+      <text id="pwL1" x="90" y="142" font-size="18" font-weight="700"></text>
       <text id="pwL2" x="90" y="168" font-size="14"></text>
       <text id="pwL3" x="90" y="190" font-size="9"></text>
       <g class="pw-bar">
         <rect x="90" y="160" width="150" height="12" fill="none" stroke="#d9f1ff" stroke-width="1.2"/>
         <rect id="pwFill" x="92" y="162" width="0" height="8" fill="#d9f1ff"/>
       </g>
+      <g class="pw-guy"><rect x="210" y="126" width="4" height="4"/><rect x="214" y="126" width="4" height="4"/><rect x="218" y="126" width="4" height="4"/><rect x="222" y="126" width="4" height="4"/><rect x="206" y="130" width="4" height="4"/><rect x="210" y="130" width="4" height="4"/><rect x="214" y="130" width="4" height="4"/><rect x="218" y="130" width="4" height="4"/><rect x="222" y="130" width="4" height="4"/><rect x="226" y="130" width="4" height="4"/><rect x="206" y="134" width="4" height="4"/><rect x="214" y="134" width="4" height="4"/><rect x="218" y="134" width="4" height="4"/><rect x="226" y="134" width="4" height="4"/><rect x="206" y="138" width="4" height="4"/><rect x="210" y="138" width="4" height="4"/><rect x="214" y="138" width="4" height="4"/><rect x="218" y="138" width="4" height="4"/><rect x="222" y="138" width="4" height="4"/><rect x="226" y="138" width="4" height="4"/><rect x="206" y="142" width="4" height="4"/><rect x="210" y="142" width="4" height="4"/><rect x="222" y="142" width="4" height="4"/><rect x="226" y="142" width="4" height="4"/><rect x="210" y="146" width="4" height="4"/><rect x="214" y="146" width="4" height="4"/><rect x="218" y="146" width="4" height="4"/><rect x="222" y="146" width="4" height="4"/><rect x="214" y="150" width="4" height="4"/><rect x="218" y="150" width="4" height="4"/><rect x="234" y="150" width="4" height="4"/><rect x="206" y="154" width="4" height="4"/><rect x="210" y="154" width="4" height="4"/><rect x="214" y="154" width="4" height="4"/><rect x="218" y="154" width="4" height="4"/><rect x="222" y="154" width="4" height="4"/><rect x="226" y="154" width="4" height="4"/><rect x="230" y="154" width="4" height="4"/><rect x="202" y="158" width="4" height="4"/><rect x="210" y="158" width="4" height="4"/><rect x="214" y="158" width="4" height="4"/><rect x="218" y="158" width="4" height="4"/><rect x="222" y="158" width="4" height="4"/><rect x="202" y="162" width="4" height="4"/><rect x="210" y="162" width="4" height="4"/><rect x="214" y="162" width="4" height="4"/><rect x="218" y="162" width="4" height="4"/><rect x="222" y="162" width="4" height="4"/><rect x="202" y="166" width="4" height="4"/><rect x="210" y="166" width="4" height="4"/><rect x="214" y="166" width="4" height="4"/><rect x="218" y="166" width="4" height="4"/><rect x="222" y="166" width="4" height="4"/><rect x="202" y="170" width="4" height="4"/><rect x="210" y="170" width="4" height="4"/><rect x="214" y="170" width="4" height="4"/><rect x="218" y="170" width="4" height="4"/><rect x="222" y="170" width="4" height="4"/><rect x="210" y="174" width="4" height="4"/><rect x="222" y="174" width="4" height="4"/><rect x="210" y="178" width="4" height="4"/><rect x="222" y="178" width="4" height="4"/><rect x="210" y="182" width="4" height="4"/><rect x="222" y="182" width="4" height="4"/><rect x="206" y="186" width="4" height="4"/><rect x="210" y="186" width="4" height="4"/><rect x="222" y="186" width="4" height="4"/><rect x="226" y="186" width="4" height="4"/><g class="pw-wa"><rect x="242" y="130" width="4" height="4"/><rect x="242" y="134" width="4" height="4"/><rect x="242" y="138" width="4" height="4"/><rect x="238" y="142" width="4" height="4"/><rect x="238" y="146" width="4" height="4"/></g><g class="pw-wb"><rect x="234" y="130" width="4" height="4"/><rect x="234" y="134" width="4" height="4"/><rect x="234" y="138" width="4" height="4"/><rect x="234" y="142" width="4" height="4"/><rect x="234" y="146" width="4" height="4"/></g></g>
       <rect x="80" y="112" width="170" height="88" fill="url(#pwPix)"/>
     </g>
     <path d="M78 110l40 0" stroke="#fff" stroke-opacity=".08" stroke-width="2"/>
