@@ -161,17 +161,47 @@ section{padding:84px 0;position:relative;z-index:1}
 .stat span{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
 @media(max-width:860px){.about-grid{grid-template-columns:1fr}}
 
-/* skills */
-.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:34px 44px;padding:0 12px}
-.ic{padding:22px 24px 20px;border-radius:10px}
-.ic::before,.ic::after{content:"";position:absolute;top:22px;bottom:22px;width:12px;background:repeating-linear-gradient(0deg,var(--copper) 0 6px,transparent 6px 20px);opacity:.8}
-.ic::before{left:-12px}.ic::after{right:-12px}
-.ic h3{margin:0 0 16px;font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--neon);font-weight:500;display:flex;justify-content:space-between;gap:10px}
-.ic h3 span{color:var(--mute)}
-.sklist{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:9px}
-.sklist li{display:flex;align-items:center;gap:9px;font-size:15.5px;padding:7px 13px;border:1px solid var(--line2);border-radius:7px;background:#080a0f;transition:.2s}
-.sklist li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--amber);flex:none}
-.sklist li:hover{border-color:var(--neon);transform:translateY(-2px)}
+
+/* skills: microcontroller pinout */
+.pin-key{display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:center;margin:0 0 30px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.pin-key span{display:inline-flex;align-items:center;gap:8px}
+.pin-key i{width:12px;height:12px;border-radius:3px;background:var(--c)}
+.pinout{display:grid;grid-template-columns:1fr minmax(150px,210px) 1fr;max-width:1080px;margin:0 auto;align-items:stretch}
+.pside{list-style:none;margin:0;padding:26px 0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pr{display:flex;align-items:center;height:40px;min-width:0}
+.pside.r .pr{flex-direction:row-reverse}
+.pt{display:inline-flex;align-items:stretch;border:1px solid color-mix(in srgb,var(--c) 50%,transparent);border-radius:7px;background:#080a0f;font-size:15px;white-space:nowrap;overflow:hidden;min-width:0;flex:none;max-width:78%;transition:border-color .2s,box-shadow .2s,transform .2s}
+.pt b{display:flex;align-items:center;padding:0 8px;background:var(--c);color:#06080b;font:600 10.5px var(--mono);letter-spacing:.08em}
+.pt em{font-style:normal;padding:7px 12px;overflow:hidden;text-overflow:ellipsis}
+.pw{position:relative;flex:1;min-width:22px;height:2px;background:var(--line2);overflow:hidden;transition:background .2s}
+.pw::after{content:"";position:absolute;top:0;left:-26px;width:26px;height:2px;background:var(--c);box-shadow:0 0 6px var(--c);animation:pinsig 3s linear infinite;animation-delay:var(--d)}
+.pside.r .pw::after{animation-name:pinsigR}
+@keyframes pinsig{0%{left:-26px}55%,100%{left:100%}}
+@keyframes pinsigR{0%{left:100%}55%,100%{left:-26px}}
+.pl{flex:none;width:16px;height:10px;border-radius:1px;background:linear-gradient(#e4e8ee,#7d838c)}
+.pr:hover .pt{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 18%,transparent);transform:translateY(-1px)}
+.pr:hover .pw{background:var(--c)}
+.pr:hover .pl{background:linear-gradient(#fff,var(--c))}
+.pr.nc .pt{opacity:.45;border-style:dashed}
+.pr.nc .pt b{background:#3a4256;color:#c4ccd9}
+.pr.nc .pw::after{display:none}
+.pchip{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:12px;background:linear-gradient(145deg,#1a1f29,#0b0e13);border:1px solid #2c3546;box-shadow:inset 0 0 0 6px #10141b,0 20px 40px rgba(0,0,0,.45);min-height:160px}
+.pchip::before{content:"";position:absolute;left:18px;top:18px;width:10px;height:10px;border-radius:50%;border:2px solid var(--copper)}
+.pnotch{position:absolute;top:-1px;left:50%;width:34px;height:17px;margin-left:-17px;border-radius:0 0 17px 17px;background:var(--bg);border:1px solid #2c3546;border-top:0}
+.pchip b{font-family:var(--mono);font-size:24px;font-weight:600;letter-spacing:.12em;color:#c9d3e3}
+.pchip small{margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mute)}
+.pchip i{position:absolute;bottom:16px;font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#4b5568}
+@media(max-width:760px){
+  .pinout{grid-template-columns:1fr}
+  .pchip{order:-1;min-height:120px;margin-bottom:8px}
+  .pside{padding:4px 0;gap:8px;flex-direction:row;flex-wrap:wrap}
+  .pchip i{display:none}
+  .pside.r .pr{flex-direction:row}
+  .pr{height:auto}.pw,.pl{display:none}
+  .pt{max-width:100%;white-space:normal}
+  .pr.nc{display:none}
+}
+
 
 /* projects */
 .grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:24px}
@@ -814,10 +844,23 @@ function render(){
   if(s.skills.length){
     nav.push(["skills", "Skills"]);
     const groups = {}; s.skills.forEach(x => (groups[x.category || "General"] ||= []).push(x));
-    out.push(`<section id="skills"><div class="wrap">${head("skills", "Skills")}<div class="chips">${
-      Object.entries(groups).map(([c, items], i) => `<div class="card ic rv"><h3>${esc(c)}<span>IC-${String(i + 1).padStart(2, "0")}</span></h3>${
-        `<ul class="sklist">${items.map(x => `<li>${esc(x.name)}</li>`).join("")}</ul>`
-      }</div>`).join("")}</div></div></section>`);
+    const PAL = ["#3b82f6", "#a3e635", "#f59e0b", "#e879f9", "#22d3ee", "#fb7185"];
+    const cats = Object.keys(groups), col = c => PAL[cats.indexOf(c) % PAL.length];
+    const sideL = [], sideR = [];
+    cats.forEach(c => (sideL.length <= sideR.length ? sideL : sideR).push(...groups[c].map(x => ({...x, cat: c}))));
+    while(sideL.length < sideR.length) sideL.push(null);
+    while(sideR.length < sideL.length) sideR.push(null);
+    let k = 0;
+    const pin = x => x ? `<li class="pr" style="--c:${col(x.cat)};--d:${(k++ * .37).toFixed(2)}s"><span class="pt"><b>${esc(String(x.cat).slice(0, 3).toUpperCase())}</b><em>${esc(x.name)}</em></span><span class="pw"></span><span class="pl"></span></li>`
+                        : `<li class="pr nc" style="--c:#3a4256"><span class="pt"><b>NC</b><em>not connected</em></span><span class="pw"></span><span class="pl"></span></li>`;
+    const ini = String(s.profile.initials || "GR").toUpperCase().slice(0, 3);
+    out.push(`<section id="skills"><div class="wrap">${head("skills", "Skills")}
+      <div class="pin-key rv">${cats.map(c => `<span style="--c:${col(c)}"><i></i>${esc(c)}</span>`).join("")}</div>
+      <div class="pinout">
+        <ul class="pside l rv">${sideL.map(pin).join("")}</ul>
+        <div class="pchip rv"><span class="pnotch"></span><b>${esc(ini)}-SKL</b><small>${s.skills.length}-PIN · SKILL IC</small><i>U1</i></div>
+        <ul class="pside r rv">${sideR.map(pin).join("")}</ul>
+      </div></div></section>`);
   }
 
   /* projects */
