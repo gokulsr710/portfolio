@@ -35,8 +35,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 #logo:active svg{transform:scale(.93)}
 #logo b{font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--mute);font-weight:500}
 .navlinks{display:flex;gap:4px;margin-left:auto}
-.navlinks a{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);padding:8px 11px;border-radius:6px;transition:.2s}
-.navlinks a:hover{color:var(--neon);background:rgba(59,130,246,.07)}
+.navlinks a,.nav a.nl{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);padding:8px 11px;border-radius:6px;transition:.2s}
+.navlinks a:hover,.nav a.nl:hover{color:var(--neon);background:rgba(59,130,246,.07)}
 .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:12px 20px;border-radius:8px;border:1px solid var(--neon);color:var(--neon);background:rgba(59,130,246,.06);transition:.2s;position:relative}
 .btn:hover{background:var(--neon);color:#ffffff}
 .btn.solid{background:var(--neon);color:#ffffff;font-weight:700}
@@ -45,7 +45,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn.copper:hover{background:var(--copper);color:#050608}
 .btn.sm{padding:7px 12px;font-size:11.5px;border-radius:6px}
 .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:860px){.navlinks{display:none}.nav .btn{margin-left:auto}}
+.nav a.nl{margin-left:-18px}
+@media(max-width:860px){.navlinks{display:none}.nav .btn,.nav a.nl{margin-left:auto}}
 
 /* ---------- hero ---------- */
 .hero{overflow-x:clip;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:110px 0 30px}
@@ -521,7 +522,7 @@ body:has(#power){overflow:hidden}
     <b id="logoName"></b>
   </button>
   <nav class="navlinks" id="navlinks"></nav>
-  <a class="btn sm" href="#links" id="navLinksBtn"></a>
+  <a class="nl" href="#links" id="navLinksBtn"></a>
 </div></header>
 
 <main id="site"></main>
@@ -775,7 +776,7 @@ function render(){
   document.title = `${p.name} · ${p.title}`;
   $("#logoTxt").textContent = (p.initials || "EE").slice(0, 3).toUpperCase();
   $("#logoName").textContent = (p.name || "").toUpperCase();
-  $("#navLinksBtn").innerHTML = `${icon("bolt")} Links`;
+  $("#navLinksBtn").textContent = "Links";
 
   /* hero */
   out.push(`<section class="hero" id="top"><div class="wrap">
