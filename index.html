@@ -108,6 +108,11 @@ section{padding:84px 0;position:relative;z-index:1}
 
 
 .igbox.yt iframe{height:auto;aspect-ratio:16/9;background:#000}
+.ytthumb{display:block;position:relative;aspect-ratio:16/9;border:1px solid var(--line2);border-radius:14px;overflow:hidden;margin-bottom:12px;background:#000}
+.ytthumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.ytthumb:hover img{transform:scale(1.04)}
+.ytthumb .play{position:absolute;top:50%;left:50%;width:64px;height:44px;margin:-22px 0 0 -32px;border-radius:12px;background:#ff0033;color:#fff;display:grid;place-items:center;font-size:18px;padding-left:3px;transition:transform .2s}
+.ytthumb:hover .play{transform:scale(1.08)}
 
 /* about */
 .about-grid{display:block}
@@ -407,7 +412,7 @@ const SCHEMA = {
     fields:[{k:"handle",label:"Handle or page name"},{k:"count",label:"Count (e.g. 12.4K)"},{k:"label",label:"Word after the count (followers, subscribers)"},{k:"icon",label:"Platform",t:"sel",opts:Object.keys(ICONS)},{k:"url",label:"Profile link"}]},
   channels:{label:"Channels", list:true, blank:{handle:"@yourpage"},
     hint:"Instagram pages and YouTube channels shown as live previews in the Channels section. Instagram works for public accounts only. A YouTube channel also needs its channel ID (on YouTube: your channel page, More, Share channel, Copy channel ID).",
-    fields:[{k:"handle",label:"Instagram handle, or page / channel link"},{k:"ytid",label:"YouTube channel ID (starts with UC, YouTube only)"}]},
+    fields:[{k:"handle",label:"Instagram handle, or page / channel link"},{k:"ytid",label:"YouTube channel ID (starts with UC, YouTube only)"},{k:"image",label:"Thumbnail picture (YouTube only; shown instead of the video player)",t:"img"}]},
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
@@ -460,7 +465,7 @@ function chanCard(c){
     const url = /youtu\.?be/i.test(h) ? safeUrl(h) : (id ? "https://www.youtube.com/channel/" + id : "");
     if(!url) return "";
     const name = (h.match(/@([\w.-]+)/) || [])[1];
-    return `<div class="igbox yt rv">${id ? `<iframe src="https://www.youtube.com/embed/videoseries?list=UU${esc(id.slice(2))}" title="YouTube channel preview" loading="lazy" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` : ""}${btn(url, "youtube", name ? "@" + name : "YouTube channel")}</div>`;
+    return `<div class="igbox yt rv">${c.image ? `<a class="ytthumb" href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(img(c.image))}" alt="Latest video on the YouTube channel"><span class="play">▶</span></a>` : id ? `<iframe src="https://www.youtube.com/embed/videoseries?list=UU${esc(id.slice(2))}" title="YouTube channel preview" loading="lazy" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` : ""}${btn(url, "youtube", name ? "@" + name : "YouTube channel")}</div>`;
   }
   const ig = igUser(h);
   return ig ? `<div class="igbox rv"><iframe src="https://www.instagram.com/${esc(ig)}/embed/" title="Instagram preview of ${esc(ig)}" loading="lazy" scrolling="no" frameborder="0"></iframe>${btn("https://www.instagram.com/" + ig + "/", "instagram", "@" + ig)}</div>` : "";
