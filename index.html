@@ -268,10 +268,52 @@ body.adm-open .adm{transform:none}
 .adm hr{border:0;border-top:1px solid var(--line);margin:18px 0}
 .adm h4{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--copper);margin:0 0 10px;text-transform:uppercase}
 .rowb{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+/* power-on intro */
+body:has(#power){overflow:hidden}
+#power{position:fixed;inset:0;z-index:100;background:#020304;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .7s ease}
+#power.gone{opacity:0;pointer-events:none}
+.pw-bulb{position:relative;width:160px;cursor:pointer}
+.pw-bulb svg{display:block;width:160px;height:250px;position:relative}
+.pw-halo{position:absolute;top:-58px;left:50%;width:260px;height:260px;margin-left:-130px;border-radius:50%;background:radial-gradient(circle,rgba(255,224,130,.6),rgba(255,200,90,.16) 42%,transparent 70%);opacity:0;transition:transform 1s ease}
+#power.lit .pw-halo{opacity:1;animation:flick .5s steps(1)}
+#power.gone .pw-halo{transform:scale(7)}
+@keyframes flick{0%{opacity:.25}20%{opacity:1}35%{opacity:.4}55%{opacity:1}}
+.pw-glass{fill:rgba(255,255,255,.025);stroke:#2a3a55;stroke-width:2;transition:fill .3s,stroke .3s}
+.pw-fil{fill:none;stroke:#39414f;stroke-width:2;stroke-linejoin:round;transition:stroke .2s}
+.pw-wire{fill:none;stroke:#1c2433;stroke-width:3;stroke-linecap:round}
+.pw-cur{fill:none;stroke:#a3e635;stroke-width:3;stroke-linecap:round;stroke-dasharray:6 10;opacity:0}
+#power.lit .pw-glass{fill:rgba(255,236,170,.2);stroke:#ffe9a8}
+#power.lit .pw-fil{stroke:#fff6c8;filter:drop-shadow(0 0 4px #ffd76a)}
+#power.lit .pw-cur{opacity:1;animation:cur .5s linear infinite}
+@keyframes cur{to{stroke-dashoffset:-16}}
+.pw-sw{width:76px;height:116px;border-radius:12px;border:1px solid var(--line2);background:linear-gradient(#151b26,#0b0e14);display:grid;place-items:center;cursor:pointer;padding:0;position:relative}
+.pw-sw:focus-visible{outline:2px solid var(--neon);outline-offset:4px}
+.pw-sw i{position:absolute;top:10px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#4a1d24;transition:background .2s}
+.pw-sw b{width:34px;height:62px;border-radius:8px;background:linear-gradient(#3a4660,#1a2130 48%,#121823 52%,#0c1018);border:1px solid #2a3a55;transform:perspective(120px) rotateX(16deg);transition:transform .15s}
+#power.lit .pw-sw i{background:#a3e635}
+#power.lit .pw-sw b{transform:perspective(120px) rotateX(-16deg);background:linear-gradient(#0c1018,#121823 48%,#1a2130 52%,#3a4660)}
+.pw-hint{margin-top:22px;font:500 13px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.pw-hint::before{content:"Flip the switch"}
+#power.lit .pw-hint::before{content:"Powering up"}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<div id="power">
+  <div class="pw-bulb" aria-hidden="true">
+    <div class="pw-halo"></div>
+    <svg viewBox="0 0 160 250">
+      <path class="pw-wire" d="M80 178C80 200 50 205 60 225S80 240 80 250"/>
+      <path class="pw-cur" d="M80 250C80 240 70 235 60 225S80 200 80 178"/>
+      <path class="pw-glass" d="M80 20A52 52 0 0 1 110 114.5C104 119.5 101 125.5 101 132.5V140H59V132.5C59 125.5 56 119.5 50 114.5A52 52 0 0 1 80 20Z"/>
+      <path class="pw-fil" d="M70 140V102L74 92L78 102L82 92L86 102L90 92V140"/>
+      <g fill="#3a4252"><rect x="58" y="141" width="44" height="8" rx="3"/><rect x="60" y="151" width="40" height="8" rx="3"/><rect x="62" y="161" width="36" height="8" rx="3"/><path d="M70 170h20l-4 8h-12z"/></g>
+    </svg>
+  </div>
+  <button class="pw-sw" id="pwSw" aria-label="Turn on the website" autofocus><i></i><b></b></button>
+  <p class="pw-hint"></p>
+</div>
 <canvas id="bgc" aria-hidden="true"></canvas>
 
 <header class="nav"><div class="wrap">
@@ -853,6 +895,23 @@ adm.addEventListener("click", e => {
   else return;
   renderTab(); changed();
 });
+
+/* ---------- power-on intro ---------- */
+(() => {
+  const pw = $("#power"); if(!pw) return;
+  let done = false;
+  const on = () => {
+    if(done) return; done = true;
+    pw.classList.add("lit");
+    setTimeout(() => {
+      pw.classList.add("gone");
+      setTimeout(() => pw.remove(), 750);
+    }, 900);
+  };
+  $("#pwSw").addEventListener("click", on);
+  $(".pw-bulb", pw).addEventListener("click", on);
+  $("#pwSw").focus({preventScroll: true});
+})();
 
 /* ---------- boot ---------- */
 (async () => {
