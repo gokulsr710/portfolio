@@ -450,6 +450,11 @@ body.adm-open .adm{transform:none}
 .adm-pub.on{display:block}
 .adm-pub b{color:#ffd58a}
 .adm-pub .btn{margin-top:8px}
+.adm-pub .pubmsg{display:block;margin-top:6px;color:var(--text)}
+.ghhelp{margin:10px 0 0;font-size:13px;color:var(--mute)}
+.ghhelp summary{cursor:pointer;color:var(--neon)}
+.ghhelp ol{margin:8px 0;padding-left:20px;line-height:1.55}
+.ghhelp li{margin:3px 0}
 .imgf{margin-bottom:12px}
 .imgf .row{display:flex;gap:10px;align-items:center;margin:6px 0}
 .imgf img{width:74px;height:56px;object-fit:contain;background:#080a0f;border-radius:6px;border:1px solid var(--line2)}
@@ -1251,11 +1256,73 @@ $("#gateForm").addEventListener("submit", e => {
     const f = $("#gateForm"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake");
   }
 });
+/* ---------- publish to GitHub (Git Data API) ----------
+   One commit containing data.json plus every embedded photo/video saved as its own file.
+   The commit goes on top of the current main branch, then gh-pages is moved to the same commit. */
+function lsGet(k){ try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } }
+function lsSet(k, v){ try{ v ? localStorage.setItem(k, v) : localStorage.removeItem(k); }catch(e){} }
+function ghToken(){ return lsGet("ghTok"); }
+function ghRepo(){
+  const saved = lsGet("ghRepo"); if(saved) return saved;
+  const h = location.hostname, m = h.match(/^([\w-]+)\.github\.io$/i);
+  if(!m) return "gokulsr710/portfolio";
+  const seg = location.pathname.split("/").filter(Boolean)[0];
+  return `${m[1]}/${seg && !/\.html?$/.test(seg) ? seg : h}`;
+}
+function pubMsg(t){ $$("#pubMsg, #admPub .pubmsg").forEach(el => el.textContent = t); }
+let publishing = false;
+async function publish(){
+  if(publishing) return;
+  const tok = ghToken(), repo = ghRepo();
+  if(!tok){ tab = "settings"; openIdx = -1; renderTabs(); renderTab(); pubMsg("Add your GitHub token below first (see “How to get a token”)."); return; }
+  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){ pubMsg("Repository should look like owner/name."); return; }
+  publishing = true;
+  const api = async (path, method = "GET", body) => {
+    const res = await fetch(`https://api.github.com/repos/${repo}${path}`, {method, headers: {Authorization: `Bearer ${tok}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(body ? {"Content-Type": "application/json"} : {})}, body: body ? JSON.stringify(body) : undefined});
+    const txt = await res.text(); let j = {}; try{ j = txt ? JSON.parse(txt) : {}; }catch(e){}
+    if(!res.ok){ const err = new Error(j.message || `HTTP ${res.status}`); err.status = res.status; throw err; }
+    return j;
+  };
+  try{
+    pubMsg("Preparing…");
+    const out = structuredClone(state), files = new Map();
+    const EXT = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov"};
+    const walk = o => { for(const k in o){ const v = o[k];
+      if(typeof v === "string"){ const m = v.match(/^data:((image|video)\/[\w.+-]+);base64,(.+)$/s);
+        if(m){ const ext = EXT[m[1]] || m[1].split("/")[1], path = `${m[2] === "video" ? "videos" : "images"}/up-${cyrb(m[3], 11)}.${ext}`; files.set(path, m[3]); o[k] = path; } }
+      else if(v && typeof v === "object") walk(v); } };
+    walk(out);
+    const json = JSON.stringify(out);
+    pubMsg("Connecting to GitHub…");
+    const ref = await api("/git/ref/heads/main"), base = await api(`/git/commits/${ref.object.sha}`);
+    const tree = []; let n = 0;
+    for(const [path, b64] of files){ n++; pubMsg(`Uploading media ${n} of ${files.size}…`); const bl = await api("/git/blobs", "POST", {content: b64, encoding: "base64"}); tree.push({path, mode: "100644", type: "blob", sha: bl.sha}); }
+    pubMsg("Uploading data…");
+    const dj = await api("/git/blobs", "POST", {content: json, encoding: "utf-8"}); tree.push({path: "data.json", mode: "100644", type: "blob", sha: dj.sha});
+    const nt = await api("/git/trees", "POST", {base_tree: base.tree.sha, tree});
+    const cm = await api("/git/commits", "POST", {message: `Update site content from the editor${files.size ? ` (${files.size} media file${files.size === 1 ? "" : "s"})` : ""}`, tree: nt.sha, parents: [ref.object.sha]});
+    pubMsg("Publishing…");
+    await api("/git/refs/heads/main", "PATCH", {sha: cm.sha, force: false});
+    let pagesNote = "";
+    try{ await api("/git/refs/heads/gh-pages", "PATCH", {sha: cm.sha, force: false}); }
+    catch(e){ if(e.status !== 404 && e.status !== 422) throw e; pagesNote = e.status === 422 ? " (the gh-pages branch had other changes and was left as it was)" : ""; }
+    publishedAt = state.updatedAt || 0; pubNote();
+    pubMsg(`Published ✓ The live site updates in about a minute${pagesNote}.`);
+    $("#status").textContent = "published ✓";
+  }catch(e){
+    const m = e.status === 401 ? "GitHub didn't accept the token. It may be wrong or expired; create a new one."
+      : e.status === 403 || e.status === 404 ? `The token can't write to ${repo}. Check the repository name and that the token has Contents: Read and write for it.`
+      : e.status === 409 || e.status === 422 ? "GitHub rejected the update because the repository changed meanwhile. Press Publish again."
+      : /Failed to fetch|NetworkError|Load failed/i.test(e.message) ? "Couldn't reach GitHub. Check your internet connection and try again."
+      : "Publishing failed: " + e.message;
+    pubMsg(m);
+  }finally{ publishing = false; }
+}
 function pubNote(){
   const el = $("#admPub"); if(!el) return;
   const pending = (state.updatedAt || 0) > publishedAt + 1000;
   el.classList.toggle("on", pending);
-  el.innerHTML = pending ? `<b>Not live yet.</b> Your changes are saved only in this browser, so other devices and visitors still see the old version. To publish them, export data.json and send it to be uploaded.<br><button class="btn sm solid" data-act="export">Export data.json</button>` : "";
+  el.innerHTML = pending ? `<b>Not live yet.</b> Your changes are saved only in this browser, so other devices and visitors still see the old version. Press <b>Publish</b> to put them on the live site.<br><button class="btn sm solid" data-act="publish">Publish</button> <button class="btn sm" data-act="export">Export data.json</button><span class="pubmsg"></span>` : "";
 }
 function openAdmin(){ document.body.classList.add("adm-open"); renderTabs(); renderTab(); pubNote(); }
 $("#fab").onclick = openAdmin;
@@ -1282,9 +1349,22 @@ function field(f, val, path){
 function renderTab(){
   const sc = SCHEMA[tab], b = $("#admBody");
   if(tab === "settings"){
-    b.innerHTML = `<h4>Publish your changes</h4>
-      <p class="hint">Edits are saved in <b>this browser</b> right away. To make them visible to every visitor, press <b>Export data.json</b> and put that file next to index.html on your web host. The site loads it automatically.</p>
-      <div class="rowb"><button class="btn sm solid" data-act="export">Export data.json</button><label class="btn sm" style="margin:0">Import<input type="file" accept="application/json,.json" id="imp" hidden></label></div>
+    const gt = ghToken();
+    b.innerHTML = `<h4>Publish to the live site</h4>
+      <p class="hint">Edits are saved in <b>this browser</b> right away. <b>Publish now</b> sends them to your GitHub repository, and every visitor sees them about a minute later.</p>
+      <label>GitHub repository<input type="text" id="ghRepo" value="${esc(ghRepo())}" autocomplete="off" spellcheck="false"></label>
+      <label>Access token ${gt ? `<span style="color:var(--amber)">· saved on this device ✓</span>` : ""}<input type="password" id="ghTok" placeholder="${gt ? "Paste a new token to replace the saved one" : "Paste your GitHub token here"}" autocomplete="off" spellcheck="false"></label>
+      <div class="rowb"><button class="btn sm" data-act="ghsave">Save token</button>${gt ? `<button class="btn sm copper" data-act="ghforget">Forget token</button>` : ""}<button class="btn sm solid" data-act="publish">Publish now</button></div>
+      <p class="hint" id="pubMsg"></p>
+      <details class="ghhelp"><summary>How to get a token (one time)</summary><ol>
+        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (signed in as the repository owner).</li>
+        <li>Name it e.g. <i>portfolio-publish</i> and pick an expiration.</li>
+        <li><b>Repository access</b>: choose <b>Only select repositories</b> and pick <b>${esc(ghRepo().split("/")[1] || "your site repo")}</b>.</li>
+        <li><b>Permissions → Repository permissions → Contents</b>: set to <b>Read and write</b>. Leave everything else as it is.</li>
+        <li>Press <b>Generate token</b>, copy it, paste it above and press <b>Save token</b>.</li>
+      </ol><p class="hint">The token is kept only in this browser on this device. It is never put into the site's files or exported data. Anyone who can use this browser can publish to your site, so only save it on your own devices. You can cancel it on GitHub at any time.</p></details>
+      <hr><h4>Backup</h4>
+      <div class="rowb"><button class="btn sm" data-act="export">Export data.json</button><label class="btn sm" style="margin:0">Import<input type="file" accept="application/json,.json" id="imp" hidden></label></div>
       <hr><h4>Change password</h4>
       <label>New password<input type="password" id="np" autocomplete="new-password"></label>
       <label>Repeat<input type="password" id="np2" autocomplete="new-password"></label>
@@ -1292,7 +1372,7 @@ function renderTab(){
       <p class="hint" id="pwMsg"></p>
       <hr><h4>Session</h4>
       <div class="rowb"><button class="btn sm" data-act="lock">Lock &amp; exit</button><button class="btn sm copper" data-act="reset">Reset everything to defaults</button></div>
-      <p class="hint">Note: this gate keeps casual visitors out of the editor. It is not bank-grade security — the site has no server, so never store secrets here.</p>`;
+      <p class="hint">Note: this gate keeps casual visitors out of the editor. It is not bank-grade security — the site has no server, so never put secrets into the site's content.</p>`;
     return;
   }
   let h = sc.hint ? `<p class="hint">${sc.hint}</p>` : "";
@@ -1379,6 +1459,13 @@ adm.addEventListener("click", e => {
   else if(act === "del"){ if(!confirm("Delete this item?")) return; arr.splice(i, 1); openIdx = -1; }
   else if(act === "up" && i > 0){ [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; openIdx = -1; }
   else if(act === "down" && i < arr.length - 1){ [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; openIdx = -1; }
+  else if(act === "ghsave"){ const v = ($("#ghTok").value || "").trim(), rp = ($("#ghRepo").value || "").trim();
+    if(rp) lsSet("ghRepo", rp);
+    if(!v){ pubMsg(rp ? "Repository saved." : "Paste a token first."); return; }
+    if(!/^(github_pat_|ghp_)[\w]{20,}$/.test(v)){ pubMsg("That doesn't look like a GitHub token (they start with github_pat_ or ghp_)."); return; }
+    lsSet("ghTok", v); renderTab(); pubMsg("Token saved on this device ✓"); return; }
+  else if(act === "ghforget"){ lsSet("ghTok", ""); renderTab(); pubMsg("Token removed from this device."); return; }
+  else if(act === "publish"){ if($("#ghRepo")) lsSet("ghRepo", ($("#ghRepo").value || "").trim() || ghRepo()); publish(); return; }
   else if(act === "export"){ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(state)], {type: "application/json"})); a.download = "data.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); return; }
   else if(act === "pw"){ const a = $("#np").value, m = $("#pwMsg"); if(a.length < 6){ m.textContent = "Use at least 6 characters."; return; } if(a !== $("#np2").value){ m.textContent = "Passwords do not match."; return; }
     state.passHash = hash(a); $("#np").value = $("#np2").value = ""; m.textContent = "Password updated ✓ (export data.json to carry it to your host)"; changed(); return; }
