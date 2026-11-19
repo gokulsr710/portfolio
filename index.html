@@ -446,6 +446,10 @@ body.adm-open .adm{transform:none}
 .adm summary button:hover{color:var(--neon);border-color:var(--neon)}
 .adm summary button.del:hover{color:var(--red);border-color:var(--red)}
 .adm details .in{padding:6px 12px 4px;border-top:1px solid var(--line)}
+.adm-pub{display:none;margin:10px 14px 0;padding:10px 12px;border:1px solid rgba(245,158,11,.5);border-radius:8px;background:rgba(245,158,11,.08);color:#f5c66b;font-size:12.5px;line-height:1.5}
+.adm-pub.on{display:block}
+.adm-pub b{color:#ffd58a}
+.adm-pub .btn{margin-top:8px}
 .imgf{margin-bottom:12px}
 .imgf .row{display:flex;gap:10px;align-items:center;margin:6px 0}
 .imgf img{width:74px;height:56px;object-fit:contain;background:#080a0f;border-radius:6px;border:1px solid var(--line2)}
@@ -664,6 +668,7 @@ body:has(#power){overflow:hidden}
 <button class="btn solid sm" id="fab">⚙ Edit site</button>
 <aside class="adm" id="adm" aria-label="Admin editor">
   <div class="adm-top">⚡ CONTROL PANEL <span id="status">ready</span><button id="admClose" title="Close">✕</button></div>
+  <div class="adm-pub" id="admPub"></div>
   <div class="tabs" id="tabs"></div>
   <div class="adm-body" id="admBody"></div>
 </aside>
@@ -892,10 +897,13 @@ function adopt(d){
   }
   state = s;
 }
+/* updatedAt of the published data.json, so the editor can tell when local edits are not live yet */
+let publishedAt = 0;
 async function load(){
   let saved = null, file = null;
   try{ saved = await dbGet("data"); }catch(e){}
   try{ const r = await fetch("data.json", {cache: "no-store"}); if(r.ok) file = await r.json(); }catch(e){}
+  publishedAt = (file && file.updatedAt) || 0;
   const pick = saved && file ? ((file.updatedAt || 0) > (saved.updatedAt || 0) ? file : saved) : (saved || file);
   adopt(pick);
 }
@@ -1226,7 +1234,13 @@ $("#gateForm").addEventListener("submit", e => {
     const f = $("#gateForm"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake");
   }
 });
-function openAdmin(){ document.body.classList.add("adm-open"); renderTabs(); renderTab(); }
+function pubNote(){
+  const el = $("#admPub"); if(!el) return;
+  const pending = (state.updatedAt || 0) > publishedAt + 1000;
+  el.classList.toggle("on", pending);
+  el.innerHTML = pending ? `<b>Not live yet.</b> Your changes are saved only in this browser, so other devices and visitors still see the old version. To publish them, export data.json and send it to be uploaded.<br><button class="btn sm solid" data-act="export">Export data.json</button>` : "";
+}
+function openAdmin(){ document.body.classList.add("adm-open"); renderTabs(); renderTab(); pubNote(); }
 $("#fab").onclick = openAdmin;
 $("#admClose").onclick = () => document.body.classList.remove("adm-open");
 
@@ -1283,7 +1297,7 @@ const getPath = path => path.split(".").reduce((o, k) => o == null ? o : o[k], s
 function setPath(path, v){ const ks = path.split("."); let o = state; while(ks.length > 1) o = o[ks.shift()]; o[ks[0]] = v; }
 let rT, sT;
 function changed(){
-  state.updatedAt = Date.now(); $("#status").textContent = "saving…";
+  state.updatedAt = Date.now(); $("#status").textContent = "saving…"; pubNote();
   clearTimeout(rT); rT = setTimeout(render, 180);
   clearTimeout(sT); sT = setTimeout(async () => { try{ await dbSet("data", state); $("#status").textContent = "saved ✓"; }catch(e){ $("#status").textContent = "save failed"; } }, 450);
 }
