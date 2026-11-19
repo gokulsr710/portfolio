@@ -245,7 +245,11 @@ section{padding:84px 0;position:relative;z-index:1}
 .prj-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
 .prj-tags span{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid var(--line2);border-radius:999px;font-family:var(--mono);font-size:10.5px;color:var(--copper)}
 .prj-tags span::before{content:"";width:5px;height:5px;border-radius:50%;border:2px solid var(--c)}
-.prj-info a.more{font-family:var(--mono);font-size:12px;letter-spacing:.06em;margin-top:4px}
+.prj-info a.more{font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+.prj-links{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:6px}
+.prj-links .gh{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line2);border-radius:8px;font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text);transition:border-color .2s,color .2s}
+.prj-links .gh:hover{border-color:var(--c);color:var(--c)}
+.prj-links .gh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .prj-nav{display:flex;justify-content:flex-end;gap:10px;margin:-6px 0 14px}
 .prj-nav button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:var(--panel);color:var(--text);font-size:20px;line-height:1;cursor:pointer;transition:border-color .2s,color .2s}
 .prj-nav button:hover{border-color:var(--neon);color:var(--neon)}
@@ -735,8 +739,8 @@ const SCHEMA = {
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
-  projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",link:""},
-    fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Image",t:"img"},{k:"link",label:"Link (URL)"}]},
+  projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",link:"",github:""},
+    fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Image",t:"img"},{k:"link",label:"Project link (URL)"},{k:"github",label:"GitHub link (URL)"}]},
   gallery:{label:"Classes & Photos", list:true, blank:{caption:"New photo",category:"Classes",image:""},
     fields:[{k:"caption",label:"Caption"},{k:"category",label:"Category (e.g. Classes, Workshops, Events)"},{k:"image",label:"Photo",t:"img"}]},
   timeline:{label:"Journey", list:true, blank:{title:"New entry",period:"",place:"",desc:""},
@@ -763,6 +767,7 @@ function safeUrl(u){
   return "https://" + u.replace(/^[a-z]+:/i, "");
 }
 function ph(label){
+  label = String(label || ""); if(label.length > 24) label = label.slice(0, 23) + "…";
   return "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'><rect width='600' height='400' fill='#0d1119'/><g stroke='#24365a' stroke-width='2' fill='none'><path d='M0 300h140l40-40h120l40 40h260M80 0v90l50 50h150M600 120H470l-40 40H330M420 400v-70l-30-30'/></g><g fill='#0d1119' stroke='#6b8fd6' stroke-width='3'><circle cx='280' cy='140' r='7'/><circle cx='330' cy='160' r='7'/><circle cx='390' cy='300' r='7'/><circle cx='180' cy='260' r='7'/></g><text x='300' y='212' fill='#3b82f6' font-family='monospace' font-size='20' text-anchor='middle'>${esc(label)}</text></svg>`);
 }
 function wafer(){
@@ -938,12 +943,12 @@ function render(){
       ${s.projects.length > 1 ? `<div class="prj-nav"><button type="button" data-pscroll="-1" aria-label="Previous projects">‹</button><button type="button" data-pscroll="1" aria-label="Next projects">›</button></div>` : ""}
       <div class="prjs">${
       s.projects.map((x, i) => {
-        const c = COLS[i % COLS.length], src = img(x.image, x.title), real = !!x.image && !/^data:image\/svg/.test(src), n = String(i + 1).padStart(2, "0");
+        const c = COLS[i % COLS.length], src = x.image ? img(x.image, "photo") : ph(""), real = !!x.image && !/^data:image\/svg/.test(src), n = String(i + 1).padStart(2, "0");
         return `<article class="prj rv" style="--c:${c}">
         <div class="prj-media${real ? "" : " ph"}" data-lb="${esc(src)}" data-cap="${esc(x.title)}">${real ? `<img class="blur" src="${esc(src)}" alt="" aria-hidden="true">` : ""}<img class="main" src="${esc(src)}" alt="${esc(x.title)}" loading="lazy"><span class="prj-badge"><i></i>PRJ-${n}</span></div>
         <div class="prj-info"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p>
           <div class="prj-tags">${list(x.tags).map(t => `<span>${esc(t)}</span>`).join("")}</div>
-          ${x.link ? `<a class="more" href="${esc(safeUrl(x.link))}" target="_blank" rel="noopener">VIEW PROJECT →</a>` : ""}
+          ${x.github || x.link ? `<div class="prj-links">${x.github ? `<a class="gh" href="${esc(safeUrl(x.github))}" target="_blank" rel="noopener">${icon("github")}GitHub</a>` : ""}${x.link ? `<a class="more" href="${esc(safeUrl(x.link))}" target="_blank" rel="noopener">VIEW PROJECT →</a>` : ""}</div>` : ""}
         </div></article>`; }).join("")}</div></div></section>`);
   }
 
