@@ -674,6 +674,23 @@ body:has(#power){overflow:hidden}
 </aside>
 
 <script>
+/* ---------- always run the newest published version ----------
+   Phones often keep an old copy of the page in their cache. On load, ask the server (bypassing
+   the cache) when the page was last published; if that is newer than the copy we are running,
+   reload once from a fresh address the cache cannot serve. */
+(async () => {
+  try{
+    const u0 = new URL(location.href);
+    if(u0.searchParams.has("v")){ u0.searchParams.delete("v"); history.replaceState(null, "", u0.pathname + u0.search + u0.hash); }
+    if(!/^https?:$/.test(location.protocol)) return;
+    const r = await fetch(location.pathname, {method: "HEAD", cache: "no-store"});
+    const live = Date.parse(r.headers.get("last-modified") || ""), mine = Date.parse(document.lastModified);
+    if(live && mine && live - mine > 2000 && sessionStorage.getItem("updTo") !== String(live)){
+      sessionStorage.setItem("updTo", String(live));
+      const u = new URL(location.href); u.searchParams.set("v", live); location.replace(u.toString());
+    }
+  }catch(e){}
+})();
 /* =====================================================================
    DATA — defaults. Everything here is editable from the admin panel
    (click the logo 5 times quickly). Default password: see README note
