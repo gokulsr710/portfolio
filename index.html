@@ -237,6 +237,15 @@ section{padding:84px 0;position:relative;z-index:1}
     linear-gradient(var(--c),var(--c)) right top/18px 2px no-repeat,linear-gradient(var(--c),var(--c)) right top/2px 18px no-repeat,
     linear-gradient(var(--c),var(--c)) left bottom/18px 2px no-repeat,linear-gradient(var(--c),var(--c)) left bottom/2px 18px no-repeat,
     linear-gradient(var(--c),var(--c)) right bottom/18px 2px no-repeat,linear-gradient(var(--c),var(--c)) right bottom/2px 18px no-repeat;opacity:.85}
+.pm-btn{position:absolute;top:50%;z-index:2;width:32px;height:32px;margin-top:-16px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(5,6,8,.65);backdrop-filter:blur(6px);color:#fff;font-size:18px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s,border-color .2s}
+.pm-btn.l{left:10px}.pm-btn.r{right:10px}
+.prj-media:hover .pm-btn{opacity:1}
+.pm-btn:hover{border-color:var(--c)}
+@media(hover:none){.pm-btn{opacity:.85}}
+.pm-dots{position:absolute;left:0;right:0;bottom:14px;z-index:2;display:flex;justify-content:center;gap:5px;pointer-events:none}
+.pm-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .2s,width .2s}
+.pm-dots i.on{width:16px;border-radius:3px;background:var(--c)}
+.pm-count{position:absolute;right:18px;top:20px;z-index:1;padding:3px 8px;border-radius:6px;background:rgba(5,6,8,.65);font:600 10.5px var(--mono);letter-spacing:.08em;color:#fff}
 .prj-badge{position:absolute;left:18px;top:18px;z-index:1;display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:7px;background:rgba(5,6,8,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.08);font:600 10.5px var(--mono);letter-spacing:.14em;color:#fff}
 .prj-badge i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
 .prj-info{display:flex;flex-direction:column;gap:8px;flex:1;padding:16px 18px 18px}
@@ -385,6 +394,11 @@ body.links-mode #links{display:block}
 .ov.open{display:flex}
 #lb img{max-height:82vh;max-width:100%;border-radius:10px;border:1px solid var(--line2)}
 #lb p{text-align:center;margin:12px 0 0;color:var(--mute)}
+.lbn{display:none;position:absolute;top:50%;width:46px;height:46px;margin-top:-23px;border-radius:50%;border:1px solid var(--line2);background:rgba(11,14,20,.85);color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
+.lbn.p{left:18px}.lbn.n{right:18px}
+.lbn:hover{border-color:var(--neon);color:var(--neon)}
+#lb.multi .lbn{display:block}
+@media(max-width:600px){.lbn{width:38px;height:38px;margin-top:-19px;font-size:20px}.lbn.p{left:8px}.lbn.n{right:8px}}
 .gatebox{width:min(400px,100%);padding:30px 28px;font-family:var(--mono);text-align:center}
 .gatebox svg{width:48px;height:48px;stroke:var(--neon);fill:none;stroke-width:1.6;margin-bottom:6px}
 .gatebox h3{margin:0 0 4px;font-size:16px;letter-spacing:.2em;color:var(--neon)}
@@ -427,6 +441,11 @@ body.adm-open .adm{transform:none}
 .imgf{margin-bottom:12px}
 .imgf .row{display:flex;gap:10px;align-items:center;margin:6px 0}
 .imgf img{width:74px;height:56px;object-fit:contain;background:#080a0f;border-radius:6px;border:1px solid var(--line2)}
+.imgs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.imgs .th{position:relative;display:block}
+.imgs .th img{width:64px;height:64px;object-fit:cover}
+.imgs .x{position:absolute;top:3px;right:3px;width:20px;height:20px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;font-size:14px;line-height:20px;cursor:pointer}
+.imgs .x:hover{background:var(--red)}
 .adm hr{border:0;border-top:1px solid var(--line);margin:18px 0}
 .adm h4{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--copper);margin:0 0 10px;text-transform:uppercase}
 .rowb{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
@@ -616,7 +635,7 @@ body:has(#power){overflow:hidden}
 <footer><div class="wrap" id="foot"></div></footer>
 
 <div id="wipe" aria-hidden="true"><span></span></div>
-<div class="ov" id="lb"><div><img alt=""><p></p></div></div>
+<div class="ov" id="lb"><button type="button" class="lbn p" data-lbstep="-1" aria-label="Previous photo">‹</button><div><img alt=""><p></p></div><button type="button" class="lbn n" data-lbstep="1" aria-label="Next photo">›</button></div>
 
 <div class="ov" id="gate"><form class="card gatebox" id="gateForm" autocomplete="off">
   <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
@@ -739,8 +758,8 @@ const SCHEMA = {
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
-  projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",link:"",github:""},
-    fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Image",t:"img"},{k:"link",label:"Project link (URL)"},{k:"github",label:"GitHub link (URL)"}]},
+  projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",images:[],link:"",github:""},
+    fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Cover image",t:"img"},{k:"images",label:"More images (shown as a slideshow on the card)",t:"imgs"},{k:"link",label:"Project link (URL)"},{k:"github",label:"GitHub link (URL)"}]},
   gallery:{label:"Classes & Photos", list:true, blank:{caption:"New photo",category:"Classes",image:""},
     fields:[{k:"caption",label:"Caption"},{k:"category",label:"Category (e.g. Classes, Workshops, Events)"},{k:"image",label:"Photo",t:"img"}]},
   timeline:{label:"Journey", list:true, blank:{title:"New entry",period:"",place:"",desc:""},
@@ -943,9 +962,11 @@ function render(){
       ${s.projects.length > 1 ? `<div class="prj-nav"><button type="button" data-pscroll="-1" aria-label="Previous projects">‹</button><button type="button" data-pscroll="1" aria-label="Next projects">›</button></div>` : ""}
       <div class="prjs">${
       s.projects.map((x, i) => {
-        const c = COLS[i % COLS.length], src = x.image ? img(x.image, "photo") : ph(""), real = !!x.image && !/^data:image\/svg/.test(src), n = String(i + 1).padStart(2, "0");
+        const c = COLS[i % COLS.length], n = String(i + 1).padStart(2, "0");
+        const pics = [x.image, ...(Array.isArray(x.images) ? x.images : [])].filter(Boolean).map(v => img(v, "photo")).filter(v => !/^data:image\/svg/.test(v));
+        const real = pics.length > 0, src = real ? pics[0] : ph(""), many = pics.length > 1;
         return `<article class="prj rv" style="--c:${c}">
-        <div class="prj-media${real ? "" : " ph"}" data-lb="${esc(src)}" data-cap="${esc(x.title)}">${real ? `<img class="blur" src="${esc(src)}" alt="" aria-hidden="true">` : ""}<img class="main" src="${esc(src)}" alt="${esc(x.title)}" loading="lazy"><span class="prj-badge"><i></i>PRJ-${n}</span></div>
+        <div class="prj-media${real ? "" : " ph"}" data-lb="${esc(src)}" data-cap="${esc(x.title)}"${many ? ` data-pics="${esc(JSON.stringify(pics))}" data-pi="0"` : ""}>${real ? `<img class="blur" src="${esc(src)}" alt="" aria-hidden="true">` : ""}<img class="main" src="${esc(src)}" alt="${esc(x.title)}" loading="lazy"><span class="prj-badge"><i></i>PRJ-${n}</span>${many ? `<button type="button" class="pm-btn l" data-pstep="-1" aria-label="Previous photo">‹</button><button type="button" class="pm-btn r" data-pstep="1" aria-label="Next photo">›</button><span class="pm-dots">${pics.map((_, k) => `<i${k ? "" : ' class="on"'}></i>`).join("")}</span><span class="pm-count">1/${pics.length}</span>` : ""}</div>
         <div class="prj-info"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p>
           <div class="prj-tags">${list(x.tags).map(t => `<span>${esc(t)}</span>`).join("")}</div>
           ${x.github || x.link ? `<div class="prj-links">${x.github ? `<a class="gh" href="${esc(safeUrl(x.github))}" target="_blank" rel="noopener">${icon("github")}GitHub</a>` : ""}${x.link ? `<a class="more" href="${esc(safeUrl(x.link))}" target="_blank" rel="noopener">VIEW PROJECT →</a>` : ""}</div>` : ""}
@@ -1033,10 +1054,34 @@ document.addEventListener("click", e => {
   if(gf){ galFilter = gf.dataset.gf; const y = scrollY; render(); $$("#classes .rv").forEach(x => x.classList.add("in")); scrollTo(0, y); return; }
   const rb = e.target.closest("[data-roll]");
   if(rb){ const t = rb.parentNode.querySelector(".gal"), d = +rb.dataset.roll; t._dir = d; t._target = Math.max(0, Math.min(t.scrollWidth - t.clientWidth, t.scrollLeft + d * t.clientWidth * .7)); return; }
+  const ps = e.target.closest("[data-pstep]");
+  if(ps){ const m = ps.closest(".prj-media"); projPic(m, +m.dataset.pi + +ps.dataset.pstep); return; }
+  const ls = e.target.closest("[data-lbstep]");
+  if(ls){ lbShow(lbIdx + +ls.dataset.lbstep); return; }
   const lb = e.target.closest("[data-lb]");
-  if(lb){ if(dragged) return; $("#lb img").src = lb.dataset.lb; $("#lb p").textContent = lb.dataset.cap || ""; $("#lb").classList.add("open"); return; }
+  if(lb){ if(dragged) return;
+    lbSet = lb.dataset.pics ? JSON.parse(lb.dataset.pics) : [lb.dataset.lb]; lbCap = lb.dataset.cap || "";
+    $("#lb").classList.toggle("multi", lbSet.length > 1); lbShow(+(lb.dataset.pi || 0)); $("#lb").classList.add("open"); return; }
   if(e.target.closest("#lb")) $("#lb").classList.remove("open");
   if(e.target.id === "gate") $("#gate").classList.remove("open");
+});
+let lbSet = [], lbIdx = 0, lbCap = "";
+function lbShow(i){
+  if(!lbSet.length) return;
+  lbIdx = (i + lbSet.length) % lbSet.length;
+  $("#lb img").src = lbSet[lbIdx];
+  $("#lb p").textContent = lbCap + (lbSet.length > 1 ? `  ·  ${lbIdx + 1} / ${lbSet.length}` : "");
+}
+/* Show photo i of a multi-photo project card. */
+function projPic(m, i){
+  const pics = JSON.parse(m.dataset.pics || "[]"); if(pics.length < 2) return;
+  i = (i + pics.length) % pics.length; m.dataset.pi = i; m.dataset.lb = pics[i];
+  m.querySelector(".main").src = pics[i]; const bl = m.querySelector(".blur"); if(bl) bl.src = pics[i];
+  m.querySelectorAll(".pm-dots i").forEach((d, k) => d.classList.toggle("on", k === i));
+  const ct = m.querySelector(".pm-count"); if(ct) ct.textContent = `${i + 1}/${pics.length}`;
+}
+document.addEventListener("keydown", e => {
+  if($("#lb").classList.contains("open") && lbSet.length > 1 && (e.key === "ArrowLeft" || e.key === "ArrowRight")){ lbShow(lbIdx + (e.key === "ArrowRight" ? 1 : -1)); }
 });
 document.addEventListener("keydown", e => {if(e.key === "Escape"){ $("#lb").classList.remove("open"); $("#gate").classList.remove("open"); }});
 function route(){ const on = location.hash === "#links"; document.body.classList.toggle("links-mode", on); if(on) scrollTo(0, 0); }
@@ -1155,6 +1200,8 @@ function field(f, val, path){
   if(f.t === "area") return `<label>${f.label}<textarea ${a} rows="${f.rows || 4}">${esc(val)}</textarea></label>`;
   if(f.t === "range") return `<label>${f.label}<output>${+val || 0}%</output><input type="range" min="0" max="100" step="5" value="${+val || 0}" ${a} data-num></label>`;
   if(f.t === "sel") return `<label>${f.label}<select ${a}>${f.opts.map(o => `<option ${o === val ? "selected" : ""}>${o}</option>`).join("")}</select></label>`;
+  if(f.t === "imgs"){ const arr = Array.isArray(val) ? val : [];
+    return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="imgs">${arr.map((v, j) => `<span class="th"><img src="${esc(img(v, "none"))}" alt=""><button type="button" class="x" data-imgdel="${path}" data-j="${j}" title="Remove this image">×</button></span>`).join("")}</div><label class="btn sm" style="margin:0;display:inline-flex">+ Add photos<input type="file" accept="image/*" multiple data-imgs="${path}" hidden></label>${arr.length ? `<span class="hint" style="margin-left:10px">${arr.length} photo${arr.length === 1 ? "" : "s"}</span>` : ""}</div>`; }
   if(f.t === "img") return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="row"><img src="${esc(img(val, "none"))}" alt=""><label class="btn sm" style="margin:0">Upload<input type="file" accept="image/*" data-img="${path}" hidden></label>${val ? `<button class="btn sm copper" data-clear="${path}">Remove</button>` : ""}</div><input type="text" ${a} placeholder="…or paste an image URL" value="${esc(/^data:/.test(val || "") ? "" : val)}"></div>`;
   return `<label>${f.label}<input type="text" ${a} value="${esc(val)}"${f === SCHEMA[tab].fields[0] && SCHEMA[tab].list ? " data-title" : ""}></label>`;
 }
@@ -1189,6 +1236,7 @@ function renderTab(){
   } else h += sc.fields.map(f => field(f, state[tab][f.k], `${tab}.${f.k}`)).join("");
   b.innerHTML = h;
 }
+const getPath = path => path.split(".").reduce((o, k) => o == null ? o : o[k], state);
 function setPath(path, v){ const ks = path.split("."); let o = state; while(ks.length > 1) o = o[ks.shift()]; o[ks[0]] = v; }
 let rT, sT;
 function changed(){
@@ -1220,10 +1268,19 @@ adm.addEventListener("change", async e => {
     $("#bulkMsg").textContent = `Added ${ok} photo${ok === 1 ? "" : "s"}${bad ? ` · ${bad} could not be read` : ""}.`;
     return;
   }
+  if(el.dataset.imgs && el.files.length){
+    const arr = Array.isArray(getPath(el.dataset.imgs)) ? getPath(el.dataset.imgs) : []; let bad = 0;
+    for(const f of el.files){ try{ arr.push(await shrink(f)); }catch(err){ bad++; } }
+    setPath(el.dataset.imgs, arr); renderTab(); changed();
+    if(bad) alert(`${bad} image${bad === 1 ? "" : "s"} could not be read.`);
+    return;
+  }
   if(el.dataset.img && el.files[0]){ try{ setPath(el.dataset.img, await shrink(el.files[0])); renderTab(); changed(); }catch(err){ alert("Could not read that image."); } }
   if(el.id === "imp" && el.files[0]){ try{ const d = JSON.parse(await el.files[0].text()); const keep = state.passHash; adopt(d); state.passHash = d.passHash || keep; changed(); alert("Imported."); }catch(err){ alert("That file is not a valid data.json."); } }
 });
 adm.addEventListener("click", e => {
+  const d = e.target.closest("[data-imgdel]");
+  if(d){ e.preventDefault(); const arr = getPath(d.dataset.imgdel); if(Array.isArray(arr)){ arr.splice(+d.dataset.j, 1); renderTab(); changed(); } return; }
   const c = e.target.closest("[data-clear]"); if(c){ setPath(c.dataset.clear, ""); renderTab(); changed(); return; }
   const b = e.target.closest("[data-act]"); if(!b) return;
   const act = b.dataset.act, i = +b.dataset.i, arr = state[tab];
