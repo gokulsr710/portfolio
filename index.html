@@ -229,6 +229,12 @@ section{padding:84px 0;position:relative;z-index:1}
 .prj-media{position:relative;display:block;aspect-ratio:1/1;overflow:hidden;background:#080a0f;cursor:zoom-in}
 .prj-media .blur{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;filter:blur(20px) brightness(.45) saturate(1.2)}
 .prj-media .main{position:relative;width:100%;height:100%;object-fit:contain;transition:transform .6s}
+.pm-stage{position:absolute;inset:0;overflow:hidden}
+.pm-stage video.main{display:block;background:#000}
+.prj-media .main.cover{object-fit:cover}
+.pm-play{position:absolute;top:50%;left:50%;z-index:1;display:grid;place-items:center;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(5,6,8,.6);backdrop-filter:blur(4px);border:2px solid var(--c);color:#fff;font-size:18px;padding-left:3px;pointer-events:none;transition:transform .2s}
+.prj-media:hover .pm-play{transform:scale(1.08)}
+.pm-dots i.v{border-radius:1px;transform:rotate(45deg)}
 .prj-media.ph .main{object-fit:cover}
 .prj:hover .prj-media .main{transform:scale(1.04)}
 .prj-media::after{content:"";position:absolute;inset:10px;pointer-events:none;
@@ -392,7 +398,9 @@ body.links-mode #links{display:block}
 /* ---------- lightbox / gate / admin ---------- */
 .ov{position:fixed;inset:0;z-index:90;background:rgba(3,4,6,.9);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)}
 .ov.open{display:flex}
-#lb img{max-height:82vh;max-width:100%;border-radius:10px;border:1px solid var(--line2)}
+#lb .lbm img,#lb .lbm video{display:block;margin:0 auto;max-height:82vh;max-width:100%;border-radius:10px;border:1px solid var(--line2);background:#000}
+#lb .lbm iframe{display:block;margin:0 auto;width:min(92vw,1100px);aspect-ratio:16/9;max-height:80vh;border:0;border-radius:10px;background:#000}
+#lb .lbm iframe.vert{width:auto;height:80vh;aspect-ratio:9/16;max-width:92vw}
 #lb p{text-align:center;margin:12px 0 0;color:var(--mute)}
 .lbn{display:none;position:absolute;top:50%;width:46px;height:46px;margin-top:-23px;border-radius:50%;border:1px solid var(--line2);background:rgba(11,14,20,.85);color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
 .lbn.p{left:18px}.lbn.n{right:18px}
@@ -446,6 +454,13 @@ body.adm-open .adm{transform:none}
 .imgs .th img{width:64px;height:64px;object-fit:cover}
 .imgs .x{position:absolute;top:3px;right:3px;width:20px;height:20px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;font-size:14px;line-height:20px;cursor:pointer}
 .imgs .x:hover{background:var(--red)}
+.vids{display:flex;flex-direction:column;gap:6px;margin:6px 0 8px}
+.vrow{position:relative;display:flex;align-items:center;gap:10px;padding:5px 34px 5px 6px;border:1px solid var(--line2);border-radius:6px;background:#080a0f;font-size:13px}
+.vrow img{width:48px;height:36px;object-fit:cover;border-radius:4px;border:0}
+.vrow b{display:grid;place-items:center;width:48px;height:36px;border-radius:4px;background:#151a23;color:var(--neon);font-size:14px}
+.vrow em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.vrow .x{position:absolute;right:6px;top:50%;margin-top:-10px;width:20px;height:20px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;cursor:pointer}
+.vrow .x:hover{background:var(--red)}
 .adm hr{border:0;border-top:1px solid var(--line);margin:18px 0}
 .adm h4{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--copper);margin:0 0 10px;text-transform:uppercase}
 .rowb{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
@@ -635,7 +650,7 @@ body:has(#power){overflow:hidden}
 <footer><div class="wrap" id="foot"></div></footer>
 
 <div id="wipe" aria-hidden="true"><span></span></div>
-<div class="ov" id="lb"><button type="button" class="lbn p" data-lbstep="-1" aria-label="Previous photo">‹</button><div><img alt=""><p></p></div><button type="button" class="lbn n" data-lbstep="1" aria-label="Next photo">›</button></div>
+<div class="ov" id="lb"><button type="button" class="lbn p" data-lbstep="-1" aria-label="Previous">‹</button><div><div class="lbm"></div><p></p></div><button type="button" class="lbn n" data-lbstep="1" aria-label="Next">›</button></div>
 
 <div class="ov" id="gate"><form class="card gatebox" id="gateForm" autocomplete="off">
   <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
@@ -758,8 +773,8 @@ const SCHEMA = {
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
-  projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",images:[],link:"",github:""},
-    fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Cover image",t:"img"},{k:"images",label:"More images (shown as a slideshow on the card)",t:"imgs"},{k:"link",label:"Project link (URL)"},{k:"github",label:"GitHub link (URL)"}]},
+  projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",images:[],videos:[],link:"",github:""},
+    fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Cover image",t:"img"},{k:"images",label:"More images (shown as a slideshow on the card)",t:"imgs"},{k:"videos",label:"Videos (YouTube links, .mp4 links or short uploaded clips)",t:"vids"},{k:"link",label:"Project link (URL)"},{k:"github",label:"GitHub link (URL)"}]},
   gallery:{label:"Classes & Photos", list:true, blank:{caption:"New photo",category:"Classes",image:""},
     fields:[{k:"caption",label:"Caption"},{k:"category",label:"Category (e.g. Classes, Workshops, Events)"},{k:"image",label:"Photo",t:"img"}]},
   timeline:{label:"Journey", list:true, blank:{title:"New entry",period:"",place:"",desc:""},
@@ -963,10 +978,9 @@ function render(){
       <div class="prjs">${
       s.projects.map((x, i) => {
         const c = COLS[i % COLS.length], n = String(i + 1).padStart(2, "0");
-        const pics = [x.image, ...(Array.isArray(x.images) ? x.images : [])].filter(Boolean).map(v => img(v, "photo")).filter(v => !/^data:image\/svg/.test(v));
-        const real = pics.length > 0, src = real ? pics[0] : ph(""), many = pics.length > 1;
+        const items = mediaItems(x), real = items.length > 0, many = items.length > 1;
         return `<article class="prj rv" style="--c:${c}">
-        <div class="prj-media${real ? "" : " ph"}" data-lb="${esc(src)}" data-cap="${esc(x.title)}"${many ? ` data-pics="${esc(JSON.stringify(pics))}" data-pi="0"` : ""}>${real ? `<img class="blur" src="${esc(src)}" alt="" aria-hidden="true">` : ""}<img class="main" src="${esc(src)}" alt="${esc(x.title)}" loading="lazy"><span class="prj-badge"><i></i>PRJ-${n}</span>${many ? `<button type="button" class="pm-btn l" data-pstep="-1" aria-label="Previous photo">‹</button><button type="button" class="pm-btn r" data-pstep="1" aria-label="Next photo">›</button><span class="pm-dots">${pics.map((_, k) => `<i${k ? "" : ' class="on"'}></i>`).join("")}</span><span class="pm-count">1/${pics.length}</span>` : ""}</div>
+        <div class="prj-media${real ? "" : " ph"}"${real ? ` data-lb="1" data-items="${esc(JSON.stringify(items))}" data-pi="0"` : ""} data-cap="${esc(x.title)}"><div class="pm-stage">${stageHTML(items[0], x.title)}</div><span class="prj-badge"><i></i>PRJ-${n}</span>${many ? `<button type="button" class="pm-btn l" data-pstep="-1" aria-label="Previous">‹</button><button type="button" class="pm-btn r" data-pstep="1" aria-label="Next">›</button><span class="pm-dots">${items.map((it, k) => `<i class="${k ? "" : "on"}${it.t === "img" ? "" : " v"}"></i>`).join("")}</span><span class="pm-count">1/${items.length}</span>` : ""}</div>
         <div class="prj-info"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p>
           <div class="prj-tags">${list(x.tags).map(t => `<span>${esc(t)}</span>`).join("")}</div>
           ${x.github || x.link ? `<div class="prj-links">${x.github ? `<a class="gh" href="${esc(safeUrl(x.github))}" target="_blank" rel="noopener">${icon("github")}GitHub</a>` : ""}${x.link ? `<a class="more" href="${esc(safeUrl(x.link))}" target="_blank" rel="noopener">VIEW PROJECT →</a>` : ""}</div>` : ""}
@@ -1060,30 +1074,54 @@ document.addEventListener("click", e => {
   if(ls){ lbShow(lbIdx + +ls.dataset.lbstep); return; }
   const lb = e.target.closest("[data-lb]");
   if(lb){ if(dragged) return;
-    lbSet = lb.dataset.pics ? JSON.parse(lb.dataset.pics) : [lb.dataset.lb]; lbCap = lb.dataset.cap || "";
+    lbSet = lb.dataset.items ? JSON.parse(lb.dataset.items) : [{t: "img", src: lb.dataset.lb}]; lbCap = lb.dataset.cap || "";
     $("#lb").classList.toggle("multi", lbSet.length > 1); lbShow(+(lb.dataset.pi || 0)); $("#lb").classList.add("open"); return; }
-  if(e.target.closest("#lb")) $("#lb").classList.remove("open");
+  if(e.target.closest("#lb") && !e.target.closest(".lbm video")) lbClose();
   if(e.target.id === "gate") $("#gate").classList.remove("open");
 });
+/* Media items: {t:"img",src} | {t:"yt",id,vert} | {t:"vid",src} */
+function vidItem(v){
+  v = String(v || "").trim(); if(!v) return null;
+  const m = v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))([\w-]{11})/i);
+  if(m) return {t: "yt", id: m[1], vert: /\/shorts\//i.test(v)};
+  if(/^data:video\//i.test(v) || /^(https?:\/\/|[\w][\w .\/-]*)[^?#]*\.(mp4|webm|mov|m4v|ogg)([?#].*)?$/i.test(v)) return {t: "vid", src: v};
+  return null;
+}
+function mediaItems(x){
+  const imgs = [x.image, ...(Array.isArray(x.images) ? x.images : [])].filter(Boolean).map(v => img(v, "photo")).filter(v => !/^data:image\/svg/.test(v)).map(src => ({t: "img", src}));
+  const vids = (Array.isArray(x.videos) ? x.videos : []).map(vidItem).filter(Boolean);
+  return imgs.length ? [imgs[0], ...vids, ...imgs.slice(1)] : vids;
+}
+function stageHTML(it, title){
+  if(!it) return `<img class="main" src="${esc(ph(""))}" alt="">`;
+  const play = `<span class="pm-play" aria-hidden="true">▶</span>`;
+  if(it.t === "yt"){ const t = `https://i.ytimg.com/vi/${esc(it.id)}/hqdefault.jpg`; return `<img class="blur" src="${t}" alt="" aria-hidden="true"><img class="main cover" src="${t}" alt="${esc(title)} video" loading="lazy">${play}`; }
+  if(it.t === "vid") return `<video class="main" src="${esc(it.src)}${/^data:/.test(it.src) ? "" : "#t=0.5"}" muted playsinline preload="metadata"></video>${play}`;
+  return `<img class="blur" src="${esc(it.src)}" alt="" aria-hidden="true"><img class="main" src="${esc(it.src)}" alt="${esc(title)}" loading="lazy">`;
+}
 let lbSet = [], lbIdx = 0, lbCap = "";
+function lbClose(){ $("#lb").classList.remove("open"); $("#lb .lbm").innerHTML = ""; }
 function lbShow(i){
   if(!lbSet.length) return;
   lbIdx = (i + lbSet.length) % lbSet.length;
-  $("#lb img").src = lbSet[lbIdx];
+  const it = lbSet[lbIdx];
+  $("#lb .lbm").innerHTML = it.t === "yt" ? `<iframe class="${it.vert ? "vert" : ""}" src="https://www.youtube-nocookie.com/embed/${esc(it.id)}?autoplay=1&rel=0&playsinline=1" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`
+    : it.t === "vid" ? `<video src="${esc(it.src)}" controls autoplay playsinline></video>`
+    : `<img src="${esc(it.src)}" alt="">`;
   $("#lb p").textContent = lbCap + (lbSet.length > 1 ? `  ·  ${lbIdx + 1} / ${lbSet.length}` : "");
 }
 /* Show photo i of a multi-photo project card. */
 function projPic(m, i){
-  const pics = JSON.parse(m.dataset.pics || "[]"); if(pics.length < 2) return;
-  i = (i + pics.length) % pics.length; m.dataset.pi = i; m.dataset.lb = pics[i];
-  m.querySelector(".main").src = pics[i]; const bl = m.querySelector(".blur"); if(bl) bl.src = pics[i];
+  const items = JSON.parse(m.dataset.items || "[]"); if(items.length < 2) return;
+  i = (i + items.length) % items.length; m.dataset.pi = i;
+  m.querySelector(".pm-stage").innerHTML = stageHTML(items[i], m.dataset.cap || "");
   m.querySelectorAll(".pm-dots i").forEach((d, k) => d.classList.toggle("on", k === i));
-  const ct = m.querySelector(".pm-count"); if(ct) ct.textContent = `${i + 1}/${pics.length}`;
+  const ct = m.querySelector(".pm-count"); if(ct) ct.textContent = `${i + 1}/${items.length}`;
 }
 document.addEventListener("keydown", e => {
   if($("#lb").classList.contains("open") && lbSet.length > 1 && (e.key === "ArrowLeft" || e.key === "ArrowRight")){ lbShow(lbIdx + (e.key === "ArrowRight" ? 1 : -1)); }
 });
-document.addEventListener("keydown", e => {if(e.key === "Escape"){ $("#lb").classList.remove("open"); $("#gate").classList.remove("open"); }});
+document.addEventListener("keydown", e => {if(e.key === "Escape"){ lbClose(); $("#gate").classList.remove("open"); }});
 function route(){ const on = location.hash === "#links"; document.body.classList.toggle("links-mode", on); if(on) scrollTo(0, 0); }
 addEventListener("hashchange", route); addEventListener("popstate", route);
 /* section transition: a wipe sweeps over the page while it jumps to the chosen section */
@@ -1200,6 +1238,11 @@ function field(f, val, path){
   if(f.t === "area") return `<label>${f.label}<textarea ${a} rows="${f.rows || 4}">${esc(val)}</textarea></label>`;
   if(f.t === "range") return `<label>${f.label}<output>${+val || 0}%</output><input type="range" min="0" max="100" step="5" value="${+val || 0}" ${a} data-num></label>`;
   if(f.t === "sel") return `<label>${f.label}<select ${a}>${f.opts.map(o => `<option ${o === val ? "selected" : ""}>${o}</option>`).join("")}</select></label>`;
+  if(f.t === "vids"){ const arr = Array.isArray(val) ? val : [];
+    return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="vids">${arr.map((v, j) => { const it = vidItem(v);
+      return `<span class="vrow">${it && it.t === "yt" ? `<img src="https://i.ytimg.com/vi/${esc(it.id)}/default.jpg" alt="">` : `<b>▶</b>`}<em>${it ? (it.t === "yt" ? "YouTube · " + esc(it.id) : /^data:/.test(v) ? "Uploaded clip " + (j + 1) : esc(v)) : "Unsupported link: " + esc(v)}</em><button type="button" class="x" data-viddel="${path}" data-j="${j}" title="Remove this video">×</button></span>`; }).join("")}</div>
+      <div class="row" style="flex-wrap:wrap"><input type="text" class="vidurl" placeholder="Paste a YouTube or .mp4 link" style="flex:1;min-width:180px"><button type="button" class="btn sm" data-vidadd="${path}">Add link</button><label class="btn sm" style="margin:0;display:inline-flex">Upload video<input type="file" accept="video/*" multiple data-vids="${path}" hidden></label></div>
+      <p class="hint" style="margin:4px 0 0">Uploaded clips are stored inside your data file, so keep them short (under 25 MB each). Longer videos work best as a YouTube link.</p></div>`; }
   if(f.t === "imgs"){ const arr = Array.isArray(val) ? val : [];
     return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="imgs">${arr.map((v, j) => `<span class="th"><img src="${esc(img(v, "none"))}" alt=""><button type="button" class="x" data-imgdel="${path}" data-j="${j}" title="Remove this image">×</button></span>`).join("")}</div><label class="btn sm" style="margin:0;display:inline-flex">+ Add photos<input type="file" accept="image/*" multiple data-imgs="${path}" hidden></label>${arr.length ? `<span class="hint" style="margin-left:10px">${arr.length} photo${arr.length === 1 ? "" : "s"}</span>` : ""}</div>`; }
   if(f.t === "img") return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="row"><img src="${esc(img(val, "none"))}" alt=""><label class="btn sm" style="margin:0">Upload<input type="file" accept="image/*" data-img="${path}" hidden></label>${val ? `<button class="btn sm copper" data-clear="${path}">Remove</button>` : ""}</div><input type="text" ${a} placeholder="…or paste an image URL" value="${esc(/^data:/.test(val || "") ? "" : val)}"></div>`;
@@ -1268,6 +1311,16 @@ adm.addEventListener("change", async e => {
     $("#bulkMsg").textContent = `Added ${ok} photo${ok === 1 ? "" : "s"}${bad ? ` · ${bad} could not be read` : ""}.`;
     return;
   }
+  if(el.dataset.vids && el.files.length){
+    const arr = Array.isArray(getPath(el.dataset.vids)) ? getPath(el.dataset.vids) : []; const big = [];
+    for(const f of el.files){
+      if(f.size > 25 * 1024 * 1024){ big.push(f.name); continue; }
+      try{ arr.push(await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(f); })); }catch(err){ big.push(f.name); }
+    }
+    setPath(el.dataset.vids, arr); renderTab(); changed();
+    if(big.length) alert(`Not added (over 25 MB or unreadable): ${big.join(", ")}. Upload these to YouTube and paste the link instead.`);
+    return;
+  }
   if(el.dataset.imgs && el.files.length){
     const arr = Array.isArray(getPath(el.dataset.imgs)) ? getPath(el.dataset.imgs) : []; let bad = 0;
     for(const f of el.files){ try{ arr.push(await shrink(f)); }catch(err){ bad++; } }
@@ -1279,6 +1332,12 @@ adm.addEventListener("change", async e => {
   if(el.id === "imp" && el.files[0]){ try{ const d = JSON.parse(await el.files[0].text()); const keep = state.passHash; adopt(d); state.passHash = d.passHash || keep; changed(); alert("Imported."); }catch(err){ alert("That file is not a valid data.json."); } }
 });
 adm.addEventListener("click", e => {
+  const vd = e.target.closest("[data-viddel]");
+  if(vd){ e.preventDefault(); const arr = getPath(vd.dataset.viddel); if(Array.isArray(arr)){ arr.splice(+vd.dataset.j, 1); renderTab(); changed(); } return; }
+  const va = e.target.closest("[data-vidadd]");
+  if(va){ e.preventDefault(); const inp = va.parentNode.querySelector(".vidurl"), v = (inp.value || "").trim(); if(!v) return;
+    if(!vidItem(v)){ alert("That link isn't supported. Use a YouTube link (video or Short) or a direct .mp4 / .webm link."); return; }
+    const arr = Array.isArray(getPath(va.dataset.vidadd)) ? getPath(va.dataset.vidadd) : []; arr.push(v); setPath(va.dataset.vidadd, arr); renderTab(); changed(); return; }
   const d = e.target.closest("[data-imgdel]");
   if(d){ e.preventDefault(); const arr = getPath(d.dataset.imgdel); if(Array.isArray(arr)){ arr.splice(+d.dataset.j, 1); renderTab(); changed(); } return; }
   const c = e.target.closest("[data-clear]"); if(c){ setPath(c.dataset.clear, ""); renderTab(); changed(); return; }
