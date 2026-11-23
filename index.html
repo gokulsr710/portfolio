@@ -265,7 +265,13 @@ section{padding:84px 0;position:relative;z-index:1}
 .prj-links .gh{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line2);border-radius:8px;font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text);transition:border-color .2s,color .2s}
 .prj-links .gh:hover{border-color:var(--c);color:var(--c)}
 .prj-links .gh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.prj-nav{display:flex;justify-content:flex-end;gap:10px;margin:-6px 0 14px}
+.prj-nav{display:flex;justify-content:flex-end;gap:10px;margin:0}
+.prj-grp+.prj-grp{margin-top:46px}
+.prj-gh{display:flex;align-items:center;gap:14px;margin:0 0 14px}
+.prj-gt{margin:0;display:inline-flex;align-items:center;gap:10px;font:600 13px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--text);white-space:nowrap}
+.prj-gt i{width:10px;height:10px;border-radius:2px;background:var(--gc);box-shadow:0 0 10px var(--gc)}
+.prj-gt span{color:var(--mute);letter-spacing:.08em}
+.prj-gline{flex:1;height:1px;background:linear-gradient(90deg,color-mix(in srgb,var(--gc) 45%,transparent),transparent)}
 .prj-nav button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:var(--panel);color:var(--text);font-size:20px;line-height:1;cursor:pointer;transition:border-color .2s,color .2s}
 .prj-nav button:hover{border-color:var(--neon);color:var(--neon)}
 @media(max-width:600px){.prj{flex-basis:78%}.prj-nav{display:none}}
@@ -800,8 +806,8 @@ const SCHEMA = {
   stats:{label:"Stats", list:true, blank:{value:"0",label:"New stat"}, fields:[{k:"label",label:"Label"},{k:"value",label:"Value"}]},
   skills:{label:"Skills", list:true, blank:{name:"New skill",category:"Electronics"},
     fields:[{k:"name",label:"Skill"},{k:"category",label:"Category (skills with the same category share a chip)"}]},
-  projects:{label:"Projects", list:true, blank:{title:"New project",desc:"",tags:"",image:"",images:[],videos:[],link:"",github:""},
-    fields:[{k:"title",label:"Title"},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Cover image",t:"img"},{k:"images",label:"More images (shown as a slideshow on the card)",t:"imgs"},{k:"videos",label:"Videos (YouTube links, .mp4 links or short uploaded clips)",t:"vids"},{k:"link",label:"Project link (URL)"},{k:"github",label:"GitHub link (URL)"}]},
+  projects:{label:"Projects", list:true, blank:{title:"New project",type:"Hardware",desc:"",tags:"",image:"",images:[],videos:[],link:"",github:""},
+    fields:[{k:"title",label:"Title"},{k:"type",label:"Type (which group it appears in)",t:"sel",opts:["Hardware","Software"]},{k:"desc",label:"Description",t:"area"},{k:"tags",label:"Tags (comma separated)"},{k:"image",label:"Cover image",t:"img"},{k:"images",label:"More images (shown as a slideshow on the card)",t:"imgs"},{k:"videos",label:"Videos (YouTube links, .mp4 links or short uploaded clips)",t:"vids"},{k:"link",label:"Project link (URL)"},{k:"github",label:"GitHub link (URL)"}]},
   gallery:{label:"Classes & Photos", list:true, blank:{caption:"New photo",category:"Classes",image:""},
     fields:[{k:"caption",label:"Caption"},{k:"category",label:"Category (e.g. Classes, Workshops, Events)"},{k:"image",label:"Photo",t:"img"}]},
   timeline:{label:"Journey", list:true, blank:{title:"New entry",period:"",place:"",desc:""},
@@ -999,18 +1005,23 @@ function render(){
   if(s.projects.length){
     nav.push(["projects", "Projects"]);
     const COLS = ["#a3e635", "#22d3ee", "#f59e0b", "#e879f9", "#3b82f6"];
-    out.push(`<section id="projects"><div class="wrap">${head("projects", "Projects")}
-      ${s.projects.length > 1 ? `<div class="prj-nav"><button type="button" data-pscroll="-1" aria-label="Previous projects">‹</button><button type="button" data-pscroll="1" aria-label="Next projects">›</button></div>` : ""}
-      <div class="prjs">${
-      s.projects.map((x, i) => {
+    const card = (x, i, pre) => {
         const c = COLS[i % COLS.length], n = String(i + 1).padStart(2, "0");
         const items = mediaItems(x), real = items.length > 0, many = items.length > 1;
         return `<article class="prj rv" style="--c:${c}">
-        <div class="prj-media${real ? "" : " ph"}"${real ? ` data-lb="1" data-items="${esc(JSON.stringify(items))}" data-pi="0"` : ""} data-cap="${esc(x.title)}"><div class="pm-stage">${stageHTML(items[0], x.title)}</div><span class="prj-badge"><i></i>PRJ-${n}</span>${many ? `<button type="button" class="pm-btn l" data-pstep="-1" aria-label="Previous">‹</button><button type="button" class="pm-btn r" data-pstep="1" aria-label="Next">›</button><span class="pm-dots">${items.map((it, k) => `<i class="${k ? "" : "on"}${it.t === "img" ? "" : " v"}"></i>`).join("")}</span><span class="pm-count">1/${items.length}</span>` : ""}</div>
+        <div class="prj-media${real ? "" : " ph"}"${real ? ` data-lb="1" data-items="${esc(JSON.stringify(items))}" data-pi="0"` : ""} data-cap="${esc(x.title)}"><div class="pm-stage">${stageHTML(items[0], x.title)}</div><span class="prj-badge"><i></i>${pre}-${n}</span>${many ? `<button type="button" class="pm-btn l" data-pstep="-1" aria-label="Previous">‹</button><button type="button" class="pm-btn r" data-pstep="1" aria-label="Next">›</button><span class="pm-dots">${items.map((it, k) => `<i class="${k ? "" : "on"}${it.t === "img" ? "" : " v"}"></i>`).join("")}</span><span class="pm-count">1/${items.length}</span>` : ""}</div>
         <div class="prj-info"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p>
           <div class="prj-tags">${list(x.tags).map(t => `<span>${esc(t)}</span>`).join("")}</div>
           ${x.github || x.link ? `<div class="prj-links">${x.github ? `<a class="gh" href="${esc(safeUrl(x.github))}" target="_blank" rel="noopener">${icon("github")}GitHub</a>` : ""}${x.link ? `<a class="more" href="${esc(safeUrl(x.link))}" target="_blank" rel="noopener">VIEW PROJECT →</a>` : ""}</div>` : ""}
-        </div></article>`; }).join("")}</div></div></section>`);
+        </div></article>`; };
+    const GROUPS = [["Hardware", "HW", "#a3e635"], ["Software", "SW", "#22d3ee"]];
+    const groups = GROUPS.map(([name, pre, gc]) => {
+      const list_ = s.projects.filter(x => (String(x.type || "").toLowerCase() === "software" ? "Software" : "Hardware") === name);
+      if(!list_.length) return "";
+      return `<div class="prj-grp" style="--gc:${gc}"><div class="prj-gh rv"><h3 class="prj-gt"><i></i>${name}<span>· ${list_.length}</span></h3><span class="prj-gline"></span>${list_.length > 1 ? `<div class="prj-nav"><button type="button" data-pscroll="-1" aria-label="Previous ${name.toLowerCase()} projects">‹</button><button type="button" data-pscroll="1" aria-label="Next ${name.toLowerCase()} projects">›</button></div>` : ""}</div>
+        <div class="prjs">${list_.map((x, i) => card(x, i, pre)).join("")}</div></div>`;
+    }).join("");
+    out.push(`<section id="projects"><div class="wrap">${head("projects", "Projects")}${groups}</div></section>`);
   }
 
   /* channels */
@@ -1476,7 +1487,7 @@ adm.addEventListener("click", e => {
 /* ---------- project row arrows ---------- */
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-pscroll]"); if(!b) return;
-  const row = document.querySelector("#projects .prjs"); if(!row) return;
+  const row = (b.closest(".prj-grp") || document).querySelector(".prjs"); if(!row) return;
   const card = row.querySelector(".prj"), step = card ? card.getBoundingClientRect().width + 22 : row.clientWidth * .8;
   row.scrollBy({left: step * +b.dataset.pscroll, behavior: "smooth"});
 });
