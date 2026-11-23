@@ -952,11 +952,7 @@ function render(){
         <h1>${esc(p.name)}</h1>
         <p class="roles">${list(p.roles).map(esc).join(" · ")}</p>
         <p class="tagline">${esc(p.tagline)}</p>
-        <div class="cta">
-          <a class="btn solid" href="#projects">View projects</a>
-          <a class="btn" href="#links">${icon("bolt")} My links</a>
-          ${p.resume ? `<a class="btn copper" href="${esc(safeUrl(p.resume))}" target="_blank" rel="noopener">${icon("doc")} Résumé</a>` : ""}
-        </div>
+        ${p.resume ? `<div class="cta"><a class="btn copper" href="${esc(safeUrl(p.resume))}" target="_blank" rel="noopener">${icon("doc")} Résumé</a></div>` : ""}
       </div>
       <div>
         ${wafer()}
