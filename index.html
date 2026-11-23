@@ -197,7 +197,9 @@ section{padding:84px 0;position:relative;z-index:1}
 .pin-key span{display:inline-flex;align-items:center;gap:8px}
 .pin-key i{width:12px;height:12px;border-radius:3px;background:var(--c)}
 .pinout{display:grid;grid-template-columns:1fr minmax(150px,210px) 1fr;max-width:1080px;margin:0 auto;align-items:stretch}
-.pside{list-style:none;margin:0;padding:26px 0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pside{list-style:none;margin:0;padding:26px 0;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
+.ic-grp+.ic-grp{margin-top:46px}
+.ic-grp .prj-gh{max-width:1080px;margin:0 auto 6px}
 .pr{display:flex;align-items:center;height:40px;min-width:0}
 .pside.r .pr{flex-direction:row-reverse}
 .pt{display:inline-flex;align-items:stretch;border:1px solid color-mix(in srgb,var(--c) 50%,transparent);border-radius:7px;background:#080a0f;font-size:15px;white-space:nowrap;overflow:hidden;min-width:0;flex:none;max-width:78%;transition:border-color .2s,box-shadow .2s,transform .2s}
@@ -222,19 +224,20 @@ section{padding:84px 0;position:relative;z-index:1}
 .pchip small{margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mute)}
 .pchip i{position:absolute;bottom:16px;font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#4b5568}
 @media(max-width:760px){
-  .pinout{grid-template-columns:58px 1fr;grid-template-rows:auto auto}
-  .pchip{grid-column:1;grid-row:1/3;min-height:0;border-radius:10px}
-  .pchip b{writing-mode:vertical-rl;transform:rotate(180deg);font-size:17px;letter-spacing:.18em}
+  .pinout{grid-template-columns:1fr 46px 1fr}
+  .pchip{min-height:0;border-radius:9px}
+  .pchip b{writing-mode:vertical-rl;transform:rotate(180deg);font-size:14px;letter-spacing:.16em}
   .pchip small,.pchip i{display:none}
-  .pchip::before{left:50%;top:auto;bottom:14px;margin-left:-5px}
-  .pside{grid-column:2;padding:8px 0;gap:8px}
-  .pside.l{grid-row:1;padding-bottom:4px}.pside.r{grid-row:2;padding-top:4px}
-  .pr,.pside.r .pr{flex-direction:row-reverse;justify-content:flex-end;height:36px}
-  .pw{flex:0 0 16px;min-width:16px}
-  .pleg{width:12px;height:8px}
-  .pt{max-width:calc(100% - 30px);font-size:14px}
-  .pt em{padding:6px 10px}
-  .pr.nc{display:none}
+  .pchip::before{left:50%;top:auto;bottom:10px;margin-left:-5px;width:8px;height:8px}
+  .pnotch{width:22px;height:11px;margin-left:-11px;border-radius:0 0 11px 11px}
+  .pside{padding:14px 0;gap:8px}
+  .pr{height:auto;min-height:34px}
+  .pt{max-width:calc(100% - 22px);white-space:normal;font-size:12.5px;line-height:1.25}
+  .pt b{padding:0 5px;font-size:9px}
+  .pt em{padding:6px 7px;overflow:visible;text-overflow:clip}
+  .pw{flex:1 0 6px;min-width:6px}
+  .pleg{width:8px;height:7px}
+}
 }
 }
 
@@ -1028,21 +1031,28 @@ function render(){
     const groups = {}; s.skills.forEach(x => (groups[x.category || "General"] ||= []).push(x));
     const PAL = ["#3b82f6", "#a3e635", "#f59e0b", "#e879f9", "#22d3ee", "#fb7185"];
     const cats = Object.keys(groups), col = c => PAL[cats.indexOf(c) % PAL.length];
-    const sideL = [], sideR = [];
-    cats.forEach(c => (sideL.length <= sideR.length ? sideL : sideR).push(...groups[c].map(x => ({...x, cat: c}))));
-    while(sideL.length < sideR.length) sideL.push(null);
-    while(sideR.length < sideL.length) sideR.push(null);
+    /* Two chips: software-ish categories go to the Software IC, everything else to the Hardware IC.
+       Each chip shares its pins evenly between its left and right sides. */
+    const SWRE = /software|program|coding|code|tool|language|script|web|app|cloud|data/i;
+    const flat = cats.flatMap(c => groups[c].map(x => ({...x, cat: c})));
     let k = 0;
-    const pin = x => x ? `<li class="pr" style="--c:${col(x.cat)};--d:${(k++ * .37).toFixed(2)}s"><span class="pt"><b>${esc(String(x.cat).slice(0, 3).toUpperCase())}</b><em>${esc(x.name)}</em></span><span class="pw"></span><span class="pleg"></span></li>`
-                        : `<li class="pr nc" style="--c:#3a4256"><span class="pt"><b>NC</b><em>not connected</em></span><span class="pw"></span><span class="pleg"></span></li>`;
-    const ini = String(s.profile.initials || "GR").toUpperCase().slice(0, 3);
+    const pin = x => `<li class="pr" style="--c:${col(x.cat)};--d:${(k++ * .37).toFixed(2)}s"><span class="pt"><b>${esc(String(x.cat).slice(0, 3).toUpperCase())}</b><em>${esc(x.name)}</em></span><span class="pw"></span><span class="pleg"></span></li>`;
+    const chip = (name, code, gc, items, u) => {
+      if(!items.length) return "";
+      const half = Math.ceil(items.length / 2), L = items.slice(0, half), R = items.slice(half);
+      return `<div class="ic-grp">
+        <div class="prj-gh rv" style="--gc:${gc}"><h3 class="prj-gt"><i></i>${name}<span>· ${items.length}</span></h3><span class="prj-gline"></span></div>
+        <div class="pinout">
+          <ul class="pside l rv">${L.map(pin).join("")}</ul>
+          <div class="pchip rv"><span class="pnotch"></span><b>${code}</b><small>${items.length}-PIN · ${name.toUpperCase()}</small><i>${u}</i></div>
+          <ul class="pside r rv">${R.map(pin).join("")}</ul>
+        </div></div>`;
+    };
     out.push(`<section id="skills"><div class="wrap">${head("skills", "Skills")}
       <div class="pin-key rv">${cats.map(c => `<span style="--c:${col(c)}"><i></i>${esc(c)}</span>`).join("")}</div>
-      <div class="pinout">
-        <ul class="pside l rv">${sideL.map(pin).join("")}</ul>
-        <div class="pchip rv"><span class="pnotch"></span><b>${esc(ini)}-SKL</b><small>${s.skills.length}-PIN · SKILL IC</small><i>U1</i></div>
-        <ul class="pside r rv">${sideR.map(pin).join("")}</ul>
-      </div></div></section>`);
+      ${chip("Hardware", "HW-IC", "#a3e635", flat.filter(x => !SWRE.test(x.cat)), "U1")}
+      ${chip("Software", "SW-IC", "#22d3ee", flat.filter(x => SWRE.test(x.cat)), "U2")}
+      </div></section>`);
   }
 
   /* projects */
