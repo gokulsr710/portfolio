@@ -199,6 +199,8 @@ section{padding:84px 0;position:relative;z-index:1}
 .pinout{display:grid;grid-template-columns:1fr minmax(150px,210px) 1fr;max-width:1080px;margin:0 auto;align-items:stretch}
 .pside{list-style:none;margin:0;padding:26px 0;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
 .ic-grp+.ic-grp{margin-top:46px}
+.sk-two{display:none}
+@media(max-width:760px){.sk-one{display:none}.sk-two{display:block}}
 .ic-grp .prj-gh{max-width:1080px;margin:0 auto 6px}
 .pr{display:flex;align-items:center;height:40px;min-width:0}
 .pside.r .pr{flex-direction:row-reverse}
@@ -1036,7 +1038,19 @@ function render(){
     const SWRE = /software|program|coding|code|tool|language|script|web|app|cloud|data/i;
     const flat = cats.flatMap(c => groups[c].map(x => ({...x, cat: c})));
     let k = 0;
-    const pin = x => `<li class="pr" style="--c:${col(x.cat)};--d:${(k++ * .37).toFixed(2)}s"><span class="pt"><b>${esc(String(x.cat).slice(0, 3).toUpperCase())}</b><em>${esc(x.name)}</em></span><span class="pw"></span><span class="pleg"></span></li>`;
+    const pin = x => x ? `<li class="pr" style="--c:${col(x.cat)};--d:${(k++ * .37).toFixed(2)}s"><span class="pt"><b>${esc(String(x.cat).slice(0, 3).toUpperCase())}</b><em>${esc(x.name)}</em></span><span class="pw"></span><span class="pleg"></span></li>`
+                        : `<li class="pr nc" style="--c:#3a4256"><span class="pt"><b>NC</b><em>not connected</em></span><span class="pw"></span><span class="pleg"></span></li>`;
+    /* Computers: one chip with every skill (whole categories per side, NC pins pad the shorter side). */
+    const oneL = [], oneR = [];
+    cats.forEach(c => (oneL.length <= oneR.length ? oneL : oneR).push(...groups[c].map(x => ({...x, cat: c}))));
+    while(oneL.length < oneR.length) oneL.push(null);
+    while(oneR.length < oneL.length) oneR.push(null);
+    const ini = String(s.profile.initials || "GR").toUpperCase().slice(0, 3);
+    const single = `<div class="sk-one"><div class="pinout">
+          <ul class="pside l rv">${oneL.map(pin).join("")}</ul>
+          <div class="pchip rv"><span class="pnotch"></span><b>${esc(ini)}-SKL</b><small>${s.skills.length}-PIN · SKILL IC</small><i>U1</i></div>
+          <ul class="pside r rv">${oneR.map(pin).join("")}</ul>
+        </div></div>`;
     const chip = (name, code, gc, items, u) => {
       if(!items.length) return "";
       const half = Math.ceil(items.length / 2), L = items.slice(0, half), R = items.slice(half);
@@ -1050,8 +1064,9 @@ function render(){
     };
     out.push(`<section id="skills"><div class="wrap">${head("skills", "Skills")}
       <div class="pin-key rv">${cats.map(c => `<span style="--c:${col(c)}"><i></i>${esc(c)}</span>`).join("")}</div>
-      ${chip("Hardware", "HW-IC", "#a3e635", flat.filter(x => !SWRE.test(x.cat)), "U1")}
-      ${chip("Software", "SW-IC", "#22d3ee", flat.filter(x => SWRE.test(x.cat)), "U2")}
+      ${single}
+      <div class="sk-two">${chip("Hardware", "HW-IC", "#a3e635", flat.filter(x => !SWRE.test(x.cat)), "U1")}
+      ${chip("Software", "SW-IC", "#22d3ee", flat.filter(x => SWRE.test(x.cat)), "U2")}</div>
       </div></section>`);
   }
 
