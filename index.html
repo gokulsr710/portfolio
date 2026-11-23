@@ -163,7 +163,11 @@ section{padding:84px 0;position:relative;z-index:1}
   .chrow .ch .btn{margin-top:12px}
   /* Instagram's embed looks oversized in a narrow phone: render it 1.45x wider, then scale it down to fit */
   .chrow .ph-scr iframe{width:145%;height:calc((150px + 68cqw) * 1.45);transform:scale(.69);transform-origin:0 0;margin-bottom:calc((150px + 68cqw) * -.45)}
-  .ch-yt{margin-top:30px}
+  .ch-yt{margin:30px auto 0;max-width:300px}
+  .ch-yt .mon{padding:8px 8px 16px;border-radius:12px}
+  .ch-yt .mon-neck{width:48px;height:24px}
+  .ch-yt .mon-base{width:140px}
+  .ch-yt .ytthumb .play{width:52px;height:36px;margin:-18px 0 0 -26px;font-size:15px}
 }
 
 /* about */
@@ -515,6 +519,22 @@ body:has(#power){overflow:hidden}
 #power.go .pw-hint::before{content:"Powering up";color:#a3e635}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.rv{opacity:1;transform:none}}
+
+/* ---------- drone cursor (mouse/trackpad devices only) ---------- */
+html.drone-on,html.drone-on *{cursor:none!important}
+html.drone-on :is(input,textarea,select,[contenteditable]){cursor:text!important}
+html.drone-on select{cursor:default!important}
+#drone{position:fixed;left:0;top:0;z-index:2147483000;width:38px;height:38px;margin:-19px 0 0 -19px;pointer-events:none;opacity:0;transition:opacity .15s;will-change:transform}
+#drone.show{opacity:1}
+#drone svg{display:block;width:100%;height:100%;overflow:visible;transition:transform .15s ease;filter:drop-shadow(0 4px 6px rgba(0,0,0,.55))}
+#drone.hot svg{transform:scale(1.18)}
+#drone .rot{fill:rgba(120,170,255,.14);stroke:rgba(140,185,255,.65);stroke-width:1}
+#drone.hot .rot{fill:rgba(163,230,53,.16);stroke:#a3e635}
+#drone .bl{transform-box:fill-box;transform-origin:center;animation:dspin .22s linear infinite}
+#drone .bl line{stroke:#dbe6ff;stroke-width:1.6;stroke-linecap:round;opacity:.85}
+@keyframes dspin{to{transform:rotate(360deg)}}
+#drone .led{fill:#a3e635;animation:jrBlink 1.2s steps(1) infinite}
+@media(prefers-reduced-motion:reduce){#drone .bl,#drone .led{animation:none}}
 </style>
 </head>
 <body>
@@ -648,6 +668,7 @@ body:has(#power){overflow:hidden}
   </svg>
   <p class="pw-hint"></p>
 </div>
+<div id="drone" aria-hidden="true"><svg viewBox="-19 -19 38 38"><g stroke="#5b6880" stroke-width="2.4" stroke-linecap="round"><line x1="-11" y1="-11" x2="11" y2="11"/><line x1="11" y1="-11" x2="-11" y2="11"/></g><circle class="rot" cx="-11" cy="-11" r="6.5"/><g class="bl"><line x1="-16.5" y1="-11" x2="-5.5" y2="-11"/></g><circle class="rot" cx="11" cy="-11" r="6.5"/><g class="bl"><line x1="5.5" y1="-11" x2="16.5" y2="-11"/></g><circle class="rot" cx="-11" cy="11" r="6.5"/><g class="bl"><line x1="-16.5" y1="11" x2="-5.5" y2="11"/></g><circle class="rot" cx="11" cy="11" r="6.5"/><g class="bl"><line x1="5.5" y1="11" x2="16.5" y2="11"/></g><rect x="-5.5" y="-6.5" width="11" height="13" rx="3.5" fill="#141a24" stroke="#3b82f6" stroke-width="1.4"/><circle class="led" cx="0" cy="-3.2" r="1.5"/><rect x="-2.5" y="1" width="5" height="2.2" rx="1" fill="#2a3446"/></svg></div>
 <canvas id="bgc" aria-hidden="true"></canvas>
 
 <header class="nav"><div class="wrap">
@@ -1581,6 +1602,26 @@ addEventListener("resize", jrProgress);
   plug.addEventListener("pointercancel", up);
   plug.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); plugIn(); } });
   plug.focus({preventScroll: true});
+})();
+
+/* ---------- drone cursor ----------
+   Mouse/trackpad devices only. The drone sits exactly on the real pointer (clicks stay precise);
+   it tilts with movement, glows over clickable things, and steps aside for text fields and embeds. */
+(() => {
+  if(!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  const d = document.getElementById("drone"), svg = d && d.querySelector("svg"); if(!d) return;
+  document.documentElement.classList.add("drone-on");
+  let x = -100, y = -100, px = 0, tilt = 0, raf = 0;
+  const HOT = "a,button,label,summary,[data-lb],[data-pstep],[data-pscroll],[data-roll],[data-lbstep],#logo,.port,.prj-media,#pwPlug";
+  const TEXT = "input,textarea,select,[contenteditable],iframe";
+  const draw = () => { raf = 0; tilt += (Math.max(-20, Math.min(20, (x - px) * 1.4)) - tilt) * .25; px = x;
+    d.style.transform = `translate(${x}px,${y}px) rotate(${tilt.toFixed(1)}deg)`; if(Math.abs(tilt) > .2) raf = requestAnimationFrame(draw); };
+  addEventListener("mousemove", e => { x = e.clientX; y = e.clientY;
+    const t = e.target, txt = t.closest && t.closest(TEXT);
+    d.classList.toggle("show", !txt); d.classList.toggle("hot", !txt && !!(t.closest && t.closest(HOT)));
+    if(!raf) raf = requestAnimationFrame(draw); }, {passive: true});
+  document.addEventListener("mouseout", e => { if(!e.relatedTarget || e.relatedTarget.tagName === "IFRAME") d.classList.remove("show"); });
+  addEventListener("blur", () => d.classList.remove("show"));
 })();
 
 /* ---------- boot ---------- */
