@@ -573,16 +573,23 @@ html[data-theme="light"] .card{box-shadow:0 6px 18px rgba(17,24,39,.06)}
 html[data-theme="light"] :is(.pchip,.io,.phn,.mon,.prj-media,.ov,#power,.chipframe,.lk .back,.adm,#fab){--bg:#050608;--panel:#0b0e14;--panel2:#111620;--line:#1c2433;--line2:#2a3a55;--copper:#6b8fd6;--neon:#3b82f6;--amber:#a3e635;--text:#e8edf5;--mute:#8a96ab;color:var(--text)}
 html[data-theme="light"] .lk .back{color:var(--copper);background:#0b0e14}
 
-/* ---------- theme switch (slide switch in the top bar) ---------- */
-.thm{position:relative;flex:none;width:52px;height:28px;padding:0;border-radius:14px;border:1px solid var(--line2);background:var(--panel2);transition:background .25s,border-color .25s}
-.thm:hover{border-color:var(--neon)}
-.thm i{position:absolute;top:3px;left:3px;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#1b2333;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .25s cubic-bezier(.3,1.3,.6,1),background .25s}
-.thm svg{width:13px;height:13px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.thm .sun{display:none;stroke:#b45309}
-.thm .moon{stroke:#a3e635}
-html[data-theme="light"] .thm i{transform:translateX(24px);background:#fde68a}
-html[data-theme="light"] .thm .sun{display:block}
-html[data-theme="light"] .thm .moon{display:none}
+/* ---------- theme switch: a little rocker switch on a plate ---------- */
+.thm{position:relative;flex:none;width:64px;height:34px;padding:4px;border-radius:8px;border:1px solid #3a4456;background:linear-gradient(180deg,#2a3140,#11151c);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 6px rgba(0,0,0,.35);transition:border-color .2s}
+.thm:hover{border-color:#5b8def}
+.thm::before,.thm::after{content:"";position:absolute;top:50%;width:3px;height:3px;margin-top:-1.5px;border-radius:50%;background:#5a6478}
+.thm::before{left:2px}.thm::after{right:2px}
+.thm .rk{display:flex;width:100%;height:100%;border-radius:5px;overflow:hidden;border:1px solid #0a0d12;transform:perspective(90px) rotateY(12deg);transition:transform .22s cubic-bezier(.3,1.4,.6,1)}
+.thm .h{flex:1;display:grid;place-items:center;transition:background .22s}
+.thm .h.l{background:linear-gradient(180deg,#141922,#0d1117);box-shadow:inset 2px 0 4px rgba(0,0,0,.6)}
+.thm .h.r{background:linear-gradient(180deg,#3a4354,#262d3a)}
+.thm svg{width:13px;height:13px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .22s,filter .22s}
+.thm .moon{stroke:#a3e635;filter:drop-shadow(0 0 3px #a3e635)}
+.thm .sun{stroke:#6b7385}
+html[data-theme="light"] .thm .rk{transform:perspective(90px) rotateY(-12deg)}
+html[data-theme="light"] .thm .h.l{background:linear-gradient(180deg,#3a4354,#262d3a);box-shadow:none}
+html[data-theme="light"] .thm .h.r{background:linear-gradient(180deg,#141922,#0d1117);box-shadow:inset -2px 0 4px rgba(0,0,0,.6)}
+html[data-theme="light"] .thm .moon{stroke:#6b7385;filter:none}
+html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fbbf24)}
 @media(max-width:860px){.nav .thm{margin-left:4px}}
 </style>
 </head>
@@ -732,7 +739,7 @@ html[data-theme="light"] .thm .moon{display:none}
   </button>
   <nav class="navlinks" id="navlinks"></nav>
   <a class="nl" href="#links" id="navLinksBtn"></a>
-  <button class="thm" id="thm" type="button" aria-label="Switch to light theme" title="Light / dark theme"><i><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></i></button>
+  <button class="thm" id="thm" type="button" aria-label="Switch to light theme" title="Light / dark theme"><span class="rk"><span class="h l"><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></span><span class="h r"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span></span></button>
 </div></header>
 
 <main id="site"></main>
