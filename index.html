@@ -161,6 +161,8 @@ section{padding:84px 0;position:relative;z-index:1}
   .chrow .ph-bar{height:28px;padding:0 16px;font-size:11.5px}
   .chrow .ph-isl{top:6px;width:64px;height:18px;margin-left:-32px}
   .chrow .ch .btn{margin-top:12px}
+  /* Instagram's embed looks oversized in a narrow phone: render it 1.45x wider, then scale it down to fit */
+  .chrow .ph-scr iframe{width:145%;height:calc((150px + 68cqw) * 1.45);transform:scale(.69);transform-origin:0 0;margin-bottom:calc((150px + 68cqw) * -.45)}
   .ch-yt{margin-top:30px}
 }
 
