@@ -548,7 +548,9 @@ html.drone-on :is(input,textarea,select,[contenteditable]){cursor:text!important
 html.drone-on select{cursor:default!important}
 #drone{position:fixed;left:0;top:0;z-index:2147483000;width:38px;height:38px;margin:-19px 0 0 -19px;pointer-events:none;opacity:0;transition:opacity .15s;will-change:transform}
 #drone.show{opacity:1}
-html.drone-touch #drone{width:30px;height:30px;margin:-15px 0 0 -15px;opacity:.92}
+html.drone-touch #drone{width:30px;height:30px;margin:-15px 0 0 -15px;opacity:.92;pointer-events:auto;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+html.drone-touch #drone::before{content:"";position:absolute;inset:-10px;border-radius:50%}
+html.drone-touch #drone.grab svg{transform:scale(1.25);transition:transform .15s}
 html.drone-touch #drone:not(.show){opacity:0}
 #drone svg{display:block;width:100%;height:100%;overflow:visible;transition:transform .15s ease;filter:drop-shadow(0 4px 6px rgba(0,0,0,.55))}
 #drone.hot svg{transform:scale(1.18)}
@@ -1765,7 +1767,12 @@ function touchDrone(d){
   document.documentElement.classList.add("drone-touch");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let cx = 0, cy = 0, tx = 0, ty = 0, tilt = 0, raf = 0, holdT = 0, backT = 0, active = false, sx = 0, sy = 0;
-  const rest = () => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight), p = Math.min(1, Math.max(0, scrollY / max));
+  /* parked = the visitor dragged the drone somewhere; it stays there until they tap it */
+  let parked = false, px = 0, py = 0, dragging = false, moved = false, gx = 0, gy = 0;
+  const clampX = v => Math.max(18, Math.min(innerWidth - 18, v)), clampY = v => Math.max(18, Math.min(innerHeight - 18, v));
+  const rest = () => {
+    if(parked){ tx = px = clampX(px); ty = py = clampY(py); return; }
+    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight), p = Math.min(1, Math.max(0, scrollY / max));
     tx = innerWidth - 24; ty = 104 + p * (innerHeight - 180); };
   const step = () => {
     raf = 0; const k = still ? 1 : (active ? .22 : .14);
@@ -1776,6 +1783,28 @@ function touchDrone(d){
   };
   const go = () => { if(!raf) raf = requestAnimationFrame(step); };
   const aim = t => { tx = t.clientX; ty = Math.max(24, t.clientY - 56); };
+
+  /* drag the drone itself: it follows the finger and stays where it is dropped; a tap sends it back to the edge */
+  d.addEventListener("touchstart", e => {
+    const t = e.touches[0]; if(!t) return;
+    e.stopPropagation(); clearTimeout(holdT); clearTimeout(backT);
+    dragging = true; moved = false; active = false; gx = t.clientX; gy = t.clientY;
+    d.classList.add("grab", "hot");
+  }, {passive: true});
+  d.addEventListener("touchmove", e => {
+    const t = e.touches[0]; if(!t || !dragging) return;
+    e.stopPropagation(); if(e.cancelable) e.preventDefault();
+    if(Math.abs(t.clientX - gx) + Math.abs(t.clientY - gy) > 8) moved = true;
+    if(moved){ tx = clampX(t.clientX); ty = clampY(t.clientY - 34); go(); }
+  }, {passive: false});
+  const drop = e => {
+    if(!dragging) return; e.stopPropagation(); dragging = false;
+    d.classList.remove("grab", "hot");
+    if(moved){ parked = true; px = tx; py = ty; }
+    else { parked = false; rest(); go(); }
+  };
+  d.addEventListener("touchend", drop);
+  d.addEventListener("touchcancel", drop);
   addEventListener("scroll", () => { if(!active) rest(); go(); }, {passive: true});
   addEventListener("resize", () => { if(!active) rest(); go(); });
   addEventListener("touchstart", e => {
