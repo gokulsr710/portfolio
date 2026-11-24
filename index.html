@@ -510,13 +510,12 @@ body.adm-open .adm{transform:none}
 body:has(#power){overflow:hidden}
 #power{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 42%,#0c1012,#020304 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease;user-select:none;-webkit-user-select:none;overflow:hidden}
 #power.gone{opacity:0;pointer-events:none}
-#power{--rx:0deg;--ry:0deg;perspective:1300px}
-#power svg{display:block;width:min(86vw,680px);height:auto;max-height:78vh;overflow:visible;filter:drop-shadow(0 30px 34px rgba(0,0,0,.75));transform:rotateX(calc(26deg + var(--ry))) rotateY(var(--rx)) rotateZ(-3deg);transform-origin:50% 60%;transition:transform .5s cubic-bezier(.2,.8,.3,1)}
-#power.gone svg{transform:rotateX(0deg) scale(1.06);transition:transform .9s ease}
+#power svg{display:block;width:min(86vw,680px);height:auto;max-height:78vh;overflow:visible;filter:drop-shadow(0 18px 40px rgba(0,0,0,.6));transition:transform .9s ease}
+#power.gone svg{transform:scale(1.05)}
 #power .lift{filter:url(#pwSh)}
 .pw-vc text{font-family:var(--mono);fill:#7df9ff;filter:drop-shadow(0 0 2px rgba(125,249,255,.75));display:none}
 #power.on .pw-vc text{display:inline}
-@media(max-width:760px){#power svg{width:80vw;margin-right:16vw;transform:rotateX(calc(20deg + var(--ry))) rotateY(var(--rx)) rotateZ(-2deg)}}
+@media(max-width:760px){#power svg{width:80vw;margin-right:16vw}}
 #pwPlug{transform:translateX(64px);transition:transform .25s cubic-bezier(.3,1.3,.6,1);cursor:grab;outline:none}
 #pwPlug.drag{transition:none;cursor:grabbing}
 #power:not(.plugged) #pwPlug:not(.drag) .pw-nudge{animation:nudgeX 1.6s ease-in-out infinite}
@@ -622,15 +621,15 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
       <linearGradient id="pwPlugG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3d42"/><stop offset=".5" stop-color="#1e2024"/><stop offset="1" stop-color="#101113"/></linearGradient>
       <linearGradient id="pwTinV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9098"/><stop offset=".4" stop-color="#e4e8ee"/><stop offset="1" stop-color="#7d838c"/></linearGradient>
       <filter id="pwSh" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="2.5" dy="5" stdDeviation="2.2" flood-color="#000" flood-opacity=".55"/></filter>
-      <linearGradient id="pwEdge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d2a5c"/><stop offset=".5" stop-color="#c9a046" stop-opacity=".55"/><stop offset=".56" stop-color="#0a1f47"/><stop offset="1" stop-color="#050f26"/></linearGradient>
+      <filter id="pwBlur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+      <linearGradient id="pwBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5f66"/><stop offset=".18" stop-color="#2c2f34"/><stop offset=".6" stop-color="#16181b"/><stop offset="1" stop-color="#08090a"/></linearGradient>
+      <linearGradient id="pwBoot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4e54"/><stop offset=".35" stop-color="#1e2023"/><stop offset="1" stop-color="#070708"/></linearGradient>
       <pattern id="pwPix" width="2" height="2" patternUnits="userSpaceOnUse">
         <rect width="2" height="2" fill="none"/><path d="M0 0h2M0 0v2" stroke="#000" stroke-opacity=".35" stroke-width=".5"/>
       </pattern>
     </defs>
 
-    <!-- board, with its edge (thickness) showing below -->
-    <rect x="20" y="32" width="520" height="320" rx="14" fill="#040b1c"/>
-    <rect x="20" y="26" width="520" height="320" rx="14" fill="url(#pwEdge)"/>
+    <!-- board -->
     <rect x="20" y="20" width="520" height="320" rx="14" fill="#c9a046"/>
     <rect x="21.5" y="21.5" width="517" height="317" rx="13" fill="url(#pwMask)"/>
     <rect x="21.5" y="21.5" width="517" height="317" rx="13" fill="none" stroke="#fff" stroke-opacity=".06" stroke-width="2"/>
@@ -643,27 +642,27 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
     <circle cx="506" cy="186" r="3.4" fill="url(#pwGold)"/><circle cx="506" cy="186" r="2.0" fill="url(#pwTin)"/><circle cx="506" cy="204" r="3.4" fill="url(#pwGold)"/><circle cx="506" cy="204" r="2.0" fill="url(#pwTin)"/><circle cx="526" cy="162" r="4" fill="url(#pwGold)"/><circle cx="526" cy="162" r="2.3" fill="url(#pwTin)"/><circle cx="526" cy="228" r="4" fill="url(#pwGold)"/><circle cx="526" cy="228" r="2.3" fill="url(#pwTin)"/>
 
     <!-- U1 DIP-28 -->
-    <circle cx="304" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="304" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="304" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="304" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="302.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="302.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="312" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="312" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="312" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="312" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="310.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="310.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="320" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="320" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="320" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="320" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="318.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="318.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="328" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="328" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="328" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="328" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="326.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="326.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="336" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="336" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="336" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="336" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="334.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="334.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="344" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="344" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="344" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="344" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="342.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="342.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="352" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="352" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="352" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="352" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="350.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="350.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="360" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="360" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="360" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="360" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="358.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="358.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="368" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="368" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="368" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="368" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="366.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="366.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="376" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="376" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="376" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="376" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="374.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="374.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="384" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="384" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="384" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="384" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="382.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="382.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="392" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="392" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="392" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="392" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="390.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="390.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="400" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="400" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="400" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="400" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="398.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="398.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="408" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="408" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="408" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="408" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="406.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="406.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><rect class="lift" x="298" y="104" width="116" height="32" rx="2" fill="url(#pwChip)"/><path d="M298 114a6 6 0 0 1 0 12" fill="#0a0b0d"/><circle cx="306" cy="129" r="2" fill="#000" opacity=".6"/><text x="358" y="119" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#8d939b">GR-328P</text><text x="358" y="129" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#6a7078">2611 · DIP-28</text>
+    <circle cx="304" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="304" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="304" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="304" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="302.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="302.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="312" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="312" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="312" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="312" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="310.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="310.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="320" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="320" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="320" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="320" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="318.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="318.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="328" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="328" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="328" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="328" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="326.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="326.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="336" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="336" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="336" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="336" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="334.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="334.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="344" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="344" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="344" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="344" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="342.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="342.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="352" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="352" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="352" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="352" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="350.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="350.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="360" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="360" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="360" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="360" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="358.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="358.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="368" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="368" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="368" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="368" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="366.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="366.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="376" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="376" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="376" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="376" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="374.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="374.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="384" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="384" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="384" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="384" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="382.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="382.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="392" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="392" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="392" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="392" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="390.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="390.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="400" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="400" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="400" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="400" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="398.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="398.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="408" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="408" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="408" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="408" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="406.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="406.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><rect x="298" y="104" width="116" height="32" rx="2" fill="url(#pwChip)"/><path d="M298 114a6 6 0 0 1 0 12" fill="#0a0b0d"/><circle cx="306" cy="129" r="2" fill="#000" opacity=".6"/><text x="358" y="119" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#8d939b">GR-328P</text><text x="358" y="129" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#6a7078">2611 · DIP-28</text>
 
     <!-- Y1 HC-49 crystal on pins 9/10 -->
     <circle cx="368" cy="176" r="4.6" fill="url(#pwGold)"/><circle cx="368" cy="176" r="2.7" fill="url(#pwTin)"/><circle cx="420" cy="176" r="4.6" fill="url(#pwGold)"/><circle cx="420" cy="176" r="2.7" fill="url(#pwTin)"/>
-    <rect class="lift" x="374" y="166" width="40" height="20" rx="10" fill="url(#pwCap)"/>
+    <rect x="374" y="166" width="40" height="20" rx="10" fill="url(#pwCap)"/>
     <text x="394" y="179" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#4a4f55">16.000</text>
 
     <!-- C1 C2 load capacitors -->
-    <circle cx="368" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="368" cy="219" r="2.0" fill="url(#pwTin)"/><circle cx="378" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="378" cy="219" r="2.0" fill="url(#pwTin)"/><path d="M368 219V210M378 219V210" stroke="url(#pwTin)" stroke-width="1.6"/><circle class="lift" cx="373" cy="206" r="8" fill="url(#pwDisc)"/><text x="373" y="208.5" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#3a1a05">22</text><circle cx="410" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="410" cy="219" r="2.0" fill="url(#pwTin)"/><circle cx="420" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="420" cy="219" r="2.0" fill="url(#pwTin)"/><path d="M410 219V210M420 219V210" stroke="url(#pwTin)" stroke-width="1.6"/><circle class="lift" cx="415" cy="206" r="8" fill="url(#pwDisc)"/><text x="415" y="208.5" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#3a1a05">22</text>
+    <circle cx="368" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="368" cy="219" r="2.0" fill="url(#pwTin)"/><circle cx="378" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="378" cy="219" r="2.0" fill="url(#pwTin)"/><path d="M368 219V210M378 219V210" stroke="url(#pwTin)" stroke-width="1.6"/><circle cx="373" cy="206" r="8" fill="url(#pwDisc)"/><text x="373" y="208.5" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#3a1a05">22</text><circle cx="410" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="410" cy="219" r="2.0" fill="url(#pwTin)"/><circle cx="420" cy="219" r="3.4" fill="url(#pwGold)"/><circle cx="420" cy="219" r="2.0" fill="url(#pwTin)"/><path d="M410 219V210M420 219V210" stroke="url(#pwTin)" stroke-width="1.6"/><circle cx="415" cy="206" r="8" fill="url(#pwDisc)"/><text x="415" y="208.5" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#3a1a05">22</text>
 
     <!-- C3 bulk capacitor across VCC/GND -->
     <circle cx="290" cy="262" r="3.6" fill="url(#pwGold)"/><circle cx="290" cy="262" r="2.1" fill="url(#pwTin)"/><circle cx="290" cy="300" r="3.6" fill="url(#pwGold)"/><circle cx="290" cy="300" r="2.1" fill="url(#pwTin)"/>
     <path d="M290 262V300" stroke="url(#pwTin)" stroke-width="1.6"/>
-    <circle class="lift" cx="290" cy="281" r="13" fill="#141a2e" stroke="#2a3557"/>
+    <circle cx="290" cy="281" r="13" fill="#141a2e" stroke="#2a3557"/>
     <path d="M277 281a13 13 0 0 1 26 0" fill="none" stroke="#9aa3b5" stroke-width="4" stroke-opacity=".85" transform="rotate(180 290 281)"/>
     <path d="M284 281h12M290 275v12" stroke="#a9b0b8" stroke-width="1.2"/>
 
     <!-- R1 + D2 status LED on pin 15 -->
-    <circle cx="430" cy="112" r="4.6" fill="url(#pwGold)"/><circle cx="430" cy="112" r="2.7" fill="url(#pwTin)"/><circle cx="486" cy="112" r="4.6" fill="url(#pwGold)"/><circle cx="486" cy="112" r="2.7" fill="url(#pwTin)"/><path d="M430 112H486" stroke="url(#pwTin)" stroke-width="2"/><rect class="lift" x="442.0" y="106" width="32" height="12" rx="5.5" fill="url(#pwResH)"/><rect x="448.0" y="106" width="3" height="12" fill="#d9a800"/><rect x="453.5" y="106" width="3" height="12" fill="#6a2c8c"/><rect x="459.0" y="106" width="3" height="12" fill="#6b3a16"/><rect x="468.5" y="106" width="3" height="12" fill="#b8932c"/>
+    <circle cx="430" cy="112" r="4.6" fill="url(#pwGold)"/><circle cx="430" cy="112" r="2.7" fill="url(#pwTin)"/><circle cx="486" cy="112" r="4.6" fill="url(#pwGold)"/><circle cx="486" cy="112" r="2.7" fill="url(#pwTin)"/><path d="M430 112H486" stroke="url(#pwTin)" stroke-width="2"/><rect x="442.0" y="106" width="32" height="12" rx="5.5" fill="url(#pwResH)"/><rect x="448.0" y="106" width="3" height="12" fill="#d9a800"/><rect x="453.5" y="106" width="3" height="12" fill="#6a2c8c"/><rect x="459.0" y="106" width="3" height="12" fill="#6b3a16"/><rect x="468.5" y="106" width="3" height="12" fill="#b8932c"/>
     <circle cx="464" cy="148" r="3.4" fill="url(#pwGold)"/><circle cx="464" cy="148" r="2.0" fill="url(#pwTin)"/><circle cx="476" cy="148" r="3.4" fill="url(#pwGold)"/><circle cx="476" cy="148" r="2.0" fill="url(#pwTin)"/>
-    <circle class="lift" cx="470" cy="140" r="7" fill="#1f2b1a" stroke="#3a4a2a"/>
+    <circle cx="470" cy="140" r="7" fill="#1f2b1a" stroke="#3a4a2a"/>
     <circle class="pw-d2" cx="470" cy="140" r="5.5"/>
 
     <!-- silkscreen -->
@@ -685,7 +684,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
     </g>
 
     <!-- OLED module -->
-    <rect class="lift" x="60" y="64" width="210" height="182" rx="6" fill="#0e1520" stroke="#1d2a3c"/>
+    <rect x="60" y="64" width="210" height="182" rx="6" fill="#0e1520" stroke="#1d2a3c"/>
     <circle cx="120" cy="78" r="5" fill="url(#pwGold)"/><circle cx="120" cy="78" r="2.2" fill="#0a0a0a"/><circle cx="140" cy="78" r="5" fill="url(#pwGold)"/><circle cx="140" cy="78" r="2.2" fill="#0a0a0a"/><circle cx="160" cy="78" r="5" fill="url(#pwGold)"/><circle cx="160" cy="78" r="2.2" fill="#0a0a0a"/><circle cx="180" cy="78" r="5" fill="url(#pwGold)"/><circle cx="180" cy="78" r="2.2" fill="#0a0a0a"/>
     <g font-family="IBM Plex Mono,monospace" font-size="7" fill="#dfe8f2" fill-opacity=".8"><text x="120" y="94" text-anchor="middle">GND</text><text x="140" y="94" text-anchor="middle">VCC</text><text x="160" y="94" text-anchor="middle">SCL</text><text x="180" y="94" text-anchor="middle">SDA</text></g>
     <circle cx="72" cy="76" r="4" fill="url(#pwGold)"/><circle cx="72" cy="76" r="2" fill="#0a0a0a"/>
@@ -708,7 +707,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
     <path d="M78 110l40 0" stroke="#fff" stroke-opacity=".08" stroke-width="2"/>
 
     <!-- 128x32 OLED: visitor counter -->
-    <rect class="lift" x="64" y="266" width="198" height="62" rx="5" fill="#0e1520" stroke="#1d2a3c"/>
+    <rect x="64" y="266" width="198" height="62" rx="5" fill="#0e1520" stroke="#1d2a3c"/>
     <g fill="url(#pwGold)"><circle cx="75" cy="276" r="3.6"/><circle cx="75" cy="290" r="3.6"/><circle cx="75" cy="304" r="3.6"/><circle cx="75" cy="318" r="3.6"/></g>
     <g fill="#0a0a0a"><circle cx="75" cy="276" r="1.6"/><circle cx="75" cy="290" r="1.6"/><circle cx="75" cy="304" r="1.6"/><circle cx="75" cy="318" r="1.6"/></g>
     <rect x="86" y="271" width="170" height="52" rx="3" fill="#050608" stroke="#2a2f36"/>
@@ -730,18 +729,33 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
           <text x="576" y="162">THE CABLE</text>
           <path d="M576 166v6m-3.5-3.5 3.5 3.5 3.5-3.5" fill="none" stroke="#a3e635" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
-        <path d="M624 195C690 195 700 270 760 380" fill="none" stroke="#111" stroke-width="13" stroke-linecap="round"/>
-        <path d="M624 191C688 191 698 264 756 372" fill="none" stroke="#3a3a3a" stroke-width="2" stroke-linecap="round"/>
-        <path d="M600 186L626 189V201L600 204Z" fill="#1c1c1c"/>
-        <rect x="550" y="176" width="52" height="38" rx="9" fill="url(#pwPlugG)"/>
-        <rect x="556" y="180" width="40" height="3" rx="1.5" fill="#fff" fill-opacity=".12"/>
+        <!-- cast shadow on the table -->
+        <path d="M560 226H612C684 214 708 290 772 392" fill="none" stroke="#000" stroke-opacity=".55" stroke-width="16" stroke-linecap="round" filter="url(#pwBlur)"/>
+        <!-- round cable: dark rim, body, soft and sharp highlights -->
+        <path d="M624 195C690 195 700 270 760 380" fill="none" stroke="#050505" stroke-width="15" stroke-linecap="round"/>
+        <path d="M624 195C690 195 700 270 760 380" fill="none" stroke="#1d1f22" stroke-width="11" stroke-linecap="round"/>
+        <path d="M624 192C688 192 698 266 757 375" fill="none" stroke="#4b5058" stroke-width="4.5" stroke-linecap="round" stroke-opacity=".85"/>
+        <path d="M624 191C688 191 697 264 756 373" fill="none" stroke="#a9b0ba" stroke-width="1.3" stroke-linecap="round" stroke-opacity=".7"/>
+        <!-- strain-relief boot -->
+        <path d="M600 185L628 188.5V201.5L600 205Z" fill="url(#pwBoot)"/>
+        <path d="M606 186.5V203.5M612 187.2V202.8M618 187.9V202.1" stroke="#000" stroke-opacity=".45" stroke-width="1"/>
+        <path d="M600 186L628 189.2" stroke="#fff" stroke-opacity=".18" stroke-width="1"/>
+        <!-- plug shell: side face for depth, then the rounded top face -->
+        <rect x="551" y="181" width="52" height="38" rx="9" fill="#040506"/>
+        <rect x="550" y="176" width="52" height="38" rx="9" fill="url(#pwBody)"/>
+        <rect x="550.5" y="176.5" width="51" height="37" rx="8.5" fill="none" stroke="#fff" stroke-opacity=".1"/>
+        <rect x="556" y="179.5" width="40" height="4" rx="2" fill="#fff" fill-opacity=".22"/>
+        <rect x="562" y="194" width="28" height="10" rx="5" fill="#000" fill-opacity=".25"/>
+        <!-- metal tongue with a darker underside -->
+        <rect x="528" y="188" width="24" height="20" rx="5" fill="#4a5058"/>
         <rect x="528" y="185" width="24" height="20" rx="5" fill="url(#pwTin)"/>
+        <rect x="530" y="186.5" width="20" height="2" rx="1" fill="#fff" fill-opacity=".55"/>
         <rect x="531" y="192" width="18" height="6" rx="3" fill="#2a2a2a"/>
       </g>
     </g>
 
     <!-- USB-C receptacle on the right edge, opening facing out -->
-    <rect class="lift" x="518" y="170" width="30" height="50" rx="5" fill="url(#pwTinV)"/>
+    <rect x="518" y="170" width="30" height="50" rx="5" fill="url(#pwTinV)"/>
     <rect x="540" y="183" width="8" height="24" rx="2" fill="#121212"/>
     <rect x="522" y="174" width="3" height="42" rx="1.5" fill="#fff" fill-opacity=".25"/>
   </svg>
@@ -1683,16 +1697,6 @@ addEventListener("resize", jrProgress);
       el.textContent = String(v).padStart(6, "0"); if(k < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   };
-
-  /* gentle 3D tilt toward the pointer */
-  if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
-    pw.addEventListener("pointermove", e => {
-      if(x0 !== null) return;
-      const nx = e.clientX / innerWidth - .5, ny = e.clientY / innerHeight - .5;
-      pw.style.setProperty("--rx", (nx * 14).toFixed(2) + "deg");
-      pw.style.setProperty("--ry", (-ny * 10).toFixed(2) + "deg");
-    });
-  }
 
   const power = () => {
     setTimeout(showVisits, 250);
