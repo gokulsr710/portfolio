@@ -608,6 +608,33 @@ html[data-theme="light"] .thm .h.r{background:linear-gradient(180deg,#141922,#0d
 html[data-theme="light"] .thm .moon{stroke:#6b7385;filter:none}
 html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fbbf24)}
 @media(max-width:860px){.nav .thm{margin-left:4px}}
+
+/* ---------- real electronics photos behind each section (free Unsplash photos, decorative only) ---------- */
+.hero{--photo:url("https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=60")}
+#about{--photo:url("https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&w=1600&q=60")}
+#skills{--photo:url("https://images.unsplash.com/photo-1592659762303-90081d34b277?auto=format&fit=crop&w=1600&q=60")}
+#projects{--photo:url("https://images.unsplash.com/photo-1640955785023-1854685dae05?auto=format&fit=crop&w=1600&q=60")}
+#journey{--photo:url("https://images.unsplash.com/photo-1581090465980-58ea88b43443?auto=format&fit=crop&w=1600&q=60")}
+#channels{--photo:url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=60")}
+#classes{--photo:url("https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&w=1600&q=60")}
+#more{--photo:url("https://images.unsplash.com/photo-1540761567564-d7839d2611b5?auto=format&fit=crop&w=1600&q=60")}
+#contact{--photo:url("https://images.unsplash.com/photo-1562408590-e32931084e23?auto=format&fit=crop&w=1600&q=60")}
+@media(max-width:760px){
+  .hero{--photo:url("https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=55")}
+  #about{--photo:url("https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&w=800&q=55")}
+  #skills{--photo:url("https://images.unsplash.com/photo-1592659762303-90081d34b277?auto=format&fit=crop&w=800&q=55")}
+  #projects{--photo:url("https://images.unsplash.com/photo-1640955785023-1854685dae05?auto=format&fit=crop&w=800&q=55")}
+  #journey{--photo:url("https://images.unsplash.com/photo-1581090465980-58ea88b43443?auto=format&fit=crop&w=800&q=55")}
+  #channels{--photo:url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=55")}
+  #classes{--photo:url("https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&w=800&q=55")}
+  #more{--photo:url("https://images.unsplash.com/photo-1540761567564-d7839d2611b5?auto=format&fit=crop&w=800&q=55")}
+  #contact{--photo:url("https://images.unsplash.com/photo-1562408590-e32931084e23?auto=format&fit=crop&w=800&q=55")}
+}
+section::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:var(--photo) center/cover no-repeat;opacity:.17;filter:saturate(.85) contrast(1.05);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 16%,#000 84%,transparent);mask-image:linear-gradient(180deg,transparent,#000 16%,#000 84%,transparent)}
+.hero::before{opacity:.24;-webkit-mask-image:radial-gradient(ellipse 75% 70% at 70% 45%,#000 30%,transparent 78%);mask-image:radial-gradient(ellipse 75% 70% at 70% 45%,#000 30%,transparent 78%)}
+html[data-theme="light"] section::before{opacity:.09;filter:grayscale(.3)}
+html[data-theme="light"] .hero::before{opacity:.13}
 </style>
 </head>
 <body>
