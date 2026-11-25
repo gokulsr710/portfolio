@@ -1719,25 +1719,34 @@ addEventListener("resize", jrProgress);
   const plug = $("#pwPlug"), svg = $("svg", pw), L1 = $("#pwL1"), L2 = $("#pwL2"), L3 = $("#pwL3"), GAP = 64;
   let done = false, x0 = null, off = 0;
 
-  /* visitor counter (free Abacus counter API): counts once per browser session */
-  const VC = "https://abacus.jasoncameron.dev/", VKEY = "grf-c7a91x/site";
-  let visits = null;
+  /* Visitor counter (free hitscounter.dev API, fast and CORS-enabled).
+     Counted once per browser session; repeat views in the same session reuse the stored number.
+     BASE carries over the 11 visits counted by the previous counter service. */
+  const VC = "https://hitscounter.dev/api/hit?output=json&url=" + encodeURIComponent("grf-c7a91x.site/portfolio"), BASE = 11;
   const local = /^(localhost|127\.|\[::1\])/.test(location.hostname);
-  let first = false; try{ first = !local && !sessionStorage.getItem("vc"); }catch(e){}
-  fetch(VC + (first ? "hit/" : "get/") + VKEY, {cache: "no-store"}).then(r => r.json()).then(j => {
-    if(typeof j.value === "number"){ visits = j.value; try{ sessionStorage.setItem("vc", "1"); }catch(e){} }
-  }).catch(() => {});
+  let visits = null, powered = false, shown = false;
+  try{ const v = +sessionStorage.getItem("vcN"); if(v > 0) visits = v; }catch(e){}
   const showVisits = () => {
-    const el = $("#pwVcN"); if(!el) return;
+    const el = $("#pwVcN"); if(!el || !powered) return;
     if(visits === null){ el.textContent = "------"; return; }
+    if(shown){ el.textContent = String(visits).padStart(6, "0"); return; }
+    shown = true;
     const t0 = performance.now(), n = visits;
     const tick = now => { const k = Math.min(1, (now - t0) / 1100), v = Math.round(n * (1 - Math.pow(1 - k, 3)));
       el.textContent = String(v).padStart(6, "0"); if(k < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   };
+  if(visits === null && !local){
+    const ctl = "AbortController" in window ? new AbortController() : null;
+    if(ctl) setTimeout(() => ctl.abort(), 8000);
+    fetch(VC, {cache: "no-store", signal: ctl && ctl.signal}).then(r => r.json()).then(j => {
+      const n = Number(j.total_hits);
+      if(n > 0){ visits = n + BASE; try{ sessionStorage.setItem("vcN", String(visits)); }catch(e){} showVisits(); }
+    }).catch(() => {});
+  }
 
   const power = () => {
-    setTimeout(showVisits, 250);
+    setTimeout(() => { powered = true; showVisits(); }, 250);
     pw.classList.add("on", "go");
     L1.textContent = "BOOTING"; L2.textContent = ""; L3.textContent = "";
     const fill = $("#pwFill"), t0 = performance.now();
