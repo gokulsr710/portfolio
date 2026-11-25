@@ -635,6 +635,9 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
       <linearGradient id="pwPlugG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3d42"/><stop offset=".5" stop-color="#1e2024"/><stop offset="1" stop-color="#101113"/></linearGradient>
       <linearGradient id="pwTinV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9098"/><stop offset=".4" stop-color="#e4e8ee"/><stop offset="1" stop-color="#7d838c"/></linearGradient>
       <filter id="pwSh" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="2.5" dy="5" stdDeviation="2.2" flood-color="#000" flood-opacity=".55"/></filter>
+      <linearGradient id="pwShellG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8d949d"/><stop offset=".18" stop-color="#f3f5f8"/><stop offset=".45" stop-color="#b9bfc7"/><stop offset=".78" stop-color="#737a83"/><stop offset="1" stop-color="#c3c8cf"/></linearGradient>
+      <linearGradient id="pwRecG" x1="0" y1="0" x2="1" y2=".25"><stop offset="0" stop-color="#7f868f"/><stop offset=".3" stop-color="#e9ecf0"/><stop offset=".6" stop-color="#b3b9c1"/><stop offset="1" stop-color="#8a9199"/></linearGradient>
+      <radialGradient id="pwSolder" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#bfc5cc"/><stop offset="1" stop-color="#6d747c"/></radialGradient>
       <filter id="pwBlur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
       <linearGradient id="pwBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5f66"/><stop offset=".18" stop-color="#2c2f34"/><stop offset=".6" stop-color="#16181b"/><stop offset="1" stop-color="#08090a"/></linearGradient>
       <linearGradient id="pwBoot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4e54"/><stop offset=".35" stop-color="#1e2023"/><stop offset="1" stop-color="#070708"/></linearGradient>
@@ -744,34 +747,51 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
           <path d="M576 166v6m-3.5-3.5 3.5 3.5 3.5-3.5" fill="none" stroke="#a3e635" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
         <!-- cast shadow on the table -->
-        <path d="M560 226H612C684 214 708 290 772 392" fill="none" stroke="#000" stroke-opacity=".55" stroke-width="16" stroke-linecap="round" filter="url(#pwBlur)"/>
-        <!-- round cable: dark rim, body, soft and sharp highlights -->
-        <path d="M624 195C690 195 700 270 760 380" fill="none" stroke="#050505" stroke-width="15" stroke-linecap="round"/>
-        <path d="M624 195C690 195 700 270 760 380" fill="none" stroke="#1d1f22" stroke-width="11" stroke-linecap="round"/>
-        <path d="M624 192C688 192 698 266 757 375" fill="none" stroke="#4b5058" stroke-width="4.5" stroke-linecap="round" stroke-opacity=".85"/>
-        <path d="M624 191C688 191 697 264 756 373" fill="none" stroke="#a9b0ba" stroke-width="1.3" stroke-linecap="round" stroke-opacity=".7"/>
-        <!-- strain-relief boot -->
-        <path d="M600 185L628 188.5V201.5L600 205Z" fill="url(#pwBoot)"/>
-        <path d="M606 186.5V203.5M612 187.2V202.8M618 187.9V202.1" stroke="#000" stroke-opacity=".45" stroke-width="1"/>
-        <path d="M600 186L628 189.2" stroke="#fff" stroke-opacity=".18" stroke-width="1"/>
-        <!-- plug shell: side face for depth, then the rounded top face -->
-        <rect x="551" y="181" width="52" height="38" rx="9" fill="#040506"/>
-        <rect x="550" y="176" width="52" height="38" rx="9" fill="url(#pwBody)"/>
-        <rect x="550.5" y="176.5" width="51" height="37" rx="8.5" fill="none" stroke="#fff" stroke-opacity=".1"/>
-        <rect x="556" y="179.5" width="40" height="4" rx="2" fill="#fff" fill-opacity=".22"/>
-        <rect x="562" y="194" width="28" height="10" rx="5" fill="#000" fill-opacity=".25"/>
-        <!-- metal tongue with a darker underside -->
-        <rect x="528" y="188" width="24" height="20" rx="5" fill="#4a5058"/>
-        <rect x="528" y="185" width="24" height="20" rx="5" fill="url(#pwTin)"/>
-        <rect x="530" y="186.5" width="20" height="2" rx="1" fill="#fff" fill-opacity=".55"/>
-        <rect x="531" y="192" width="18" height="6" rx="3" fill="#2a2a2a"/>
+        <path d="M556 226H640C700 216 712 292 774 394" fill="none" stroke="#000" stroke-opacity=".55" stroke-width="18" stroke-linecap="round" filter="url(#pwBlur)"/>
+        <!-- round cable: dark rim, jacket, soft and sharp highlights -->
+        <path d="M638 195C700 195 706 270 760 380" fill="none" stroke="#050505" stroke-width="15" stroke-linecap="round"/>
+        <path d="M638 195C700 195 706 270 760 380" fill="none" stroke="#1d1f22" stroke-width="11" stroke-linecap="round"/>
+        <path d="M638 192C698 192 704 266 757 375" fill="none" stroke="#4b5058" stroke-width="4.5" stroke-linecap="round" stroke-opacity=".85"/>
+        <path d="M638 191C698 191 703 264 756 373" fill="none" stroke="#a9b0ba" stroke-width="1.3" stroke-linecap="round" stroke-opacity=".7"/>
+        <!-- tapered strain-relief boot with flex ridges -->
+        <path d="M600 176C616 177 628 184 644 187V203C628 206 616 213 600 214Z" fill="url(#pwBoot)"/>
+        <g stroke="#000" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"><path d="M608 178.5V211.5"/><path d="M615 180.5V209.5"/><path d="M622 183V207"/><path d="M629 184.8V205.2"/><path d="M636 186.2V203.8"/></g>
+        <g stroke="#fff" stroke-opacity=".14" stroke-width="1" stroke-linecap="round"><path d="M610 179V196"/><path d="M617 181V196"/><path d="M624 183.5V196"/><path d="M631 185.2V196"/></g>
+        <!-- overmolded plug body: side face, top face, parting line, grip recess -->
+        <rect x="551" y="175" width="54" height="48" rx="8" fill="#030405"/>
+        <rect x="550" y="171" width="54" height="48" rx="8" fill="url(#pwBody)"/>
+        <rect x="550.5" y="171.5" width="53" height="47" rx="7.5" fill="none" stroke="#fff" stroke-opacity=".1"/>
+        <rect x="556" y="174" width="42" height="4" rx="2" fill="#fff" fill-opacity=".2"/>
+        <path d="M553 214.5H601" stroke="#000" stroke-opacity=".5" stroke-width="1"/>
+        <rect x="566" y="184" width="24" height="22" rx="11" fill="#000" fill-opacity=".28"/>
+        <path d="M568 204a11 11 0 0 0 20 0" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="1"/>
+        <!-- stainless plug shell (goes inside the port) -->
+        <path d="M552 180H529Q522 180 522 187V209Q522 216 529 216H552Z" fill="#454b53"/>
+        <path d="M552 177H529Q522 177 522 184V206Q522 213 529 213H552Z" fill="url(#pwShellG)"/>
+        <path d="M523.5 184Q523.5 178.5 529 178.5H552" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width=".8"/>
+        <path d="M527 195H551" stroke="#3a3f46" stroke-opacity=".45" stroke-width=".8"/>
+        <rect x="537" y="180.5" width="7" height="3" rx="1" fill="#2a2e33" fill-opacity=".55"/>
+        <rect x="537" y="206.5" width="7" height="3" rx="1" fill="#2a2e33" fill-opacity=".55"/>
+        <path d="M550 177V213" stroke="#000" stroke-opacity=".35" stroke-width="1.2"/>
       </g>
     </g>
 
-    <!-- USB-C receptacle on the right edge, opening facing out -->
-    <rect class="lift" x="518" y="170" width="30" height="50" rx="5" fill="url(#pwTinV)"/>
-    <rect x="540" y="183" width="8" height="24" rx="2" fill="#121212"/>
-    <rect x="522" y="174" width="3" height="42" rx="1.5" fill="#fff" fill-opacity=".25"/>
+    <!-- USB-C receptacle (top view): 12 SMD pins at the back, two through-hole shell tabs, stamped steel shell -->
+    <rect x="508" y="175.5" width="8" height="39" rx="1" fill="url(#pwGold)" opacity=".9"/>
+    <g fill="#dfe3e8"><rect x="510" y="177.20" width="7" height="1.5" rx=".5"/><rect x="510" y="180.45" width="7" height="1.5" rx=".5"/><rect x="510" y="183.70" width="7" height="1.5" rx=".5"/><rect x="510" y="186.95" width="7" height="1.5" rx=".5"/><rect x="510" y="190.20" width="7" height="1.5" rx=".5"/><rect x="510" y="193.45" width="7" height="1.5" rx=".5"/><rect x="510" y="196.70" width="7" height="1.5" rx=".5"/><rect x="510" y="199.95" width="7" height="1.5" rx=".5"/><rect x="510" y="203.20" width="7" height="1.5" rx=".5"/><rect x="510" y="206.45" width="7" height="1.5" rx=".5"/><rect x="510" y="209.70" width="7" height="1.5" rx=".5"/><rect x="510" y="212.95" width="7" height="1.5" rx=".5"/></g>
+    <rect x="522" y="157" width="8" height="12" rx="1.5" fill="url(#pwTin)"/>
+    <rect x="522" y="221" width="8" height="12" rx="1.5" fill="url(#pwTin)"/>
+    <ellipse cx="526" cy="162" rx="4.6" ry="4" fill="url(#pwSolder)"/>
+    <ellipse cx="526" cy="228" rx="4.6" ry="4" fill="url(#pwSolder)"/>
+    <rect class="lift" x="516" y="168" width="32" height="54" rx="3" fill="url(#pwRecG)" stroke="#5d646c" stroke-width=".6"/>
+    <g stroke="#fff" stroke-opacity=".12" stroke-width=".5"><path d="M518 172H543"/><path d="M518 180H543"/><path d="M518 191H543"/><path d="M518 201H543"/><path d="M518 211H543"/><path d="M518 218H543"/></g>
+    <rect x="521.5" y="177.5" width="19" height="35" rx="2" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".8"/>
+    <rect x="522.5" y="178.5" width="19" height="35" rx="2" fill="none" stroke="#000" stroke-opacity=".25" stroke-width=".8"/>
+    <rect x="526" y="171" width="9" height="3" rx="1" fill="#1d2024"/>
+    <rect x="526" y="216" width="9" height="3" rx="1" fill="#1d2024"/>
+    <rect x="543" y="168" width="5" height="54" rx="2" fill="#8c939b"/>
+    <path d="M543.6 169V221" stroke="#fff" stroke-opacity=".6" stroke-width=".8"/>
+    <path d="M547.4 171V219" stroke="#0b0c0e" stroke-width="1.4"/>
   </svg>
   <p class="pw-hint"></p>
 </div>
