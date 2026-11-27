@@ -465,6 +465,20 @@ body.adm-open .adm{transform:none}
 .adm-top #status{margin-left:auto;color:var(--mute);font-size:11px;letter-spacing:.04em}
 .adm-top button{background:none;border:1px solid var(--line2);border-radius:6px;width:30px;height:30px;color:var(--mute)}
 .adm-top button:hover{color:var(--red);border-color:var(--red)}
+.adm-top button.fs{display:grid;place-items:center;padding:0}
+.adm-top button.fs:hover{color:var(--neon);border-color:var(--neon)}
+.adm-top .fs svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.adm .i-norm,body.adm-full .adm .i-full{display:none}
+body.adm-full .adm .i-norm{display:block}
+/* full-screen editor: whole window, content centred in a comfortable column */
+body.adm-full .adm{width:100%;border-left:0;box-shadow:none}
+body.adm-full .adm-top,body.adm-full .tabs,body.adm-full .adm-body{padding-left:max(16px,calc(50% - 520px));padding-right:max(16px,calc(50% - 520px))}
+body.adm-full .tabs{justify-content:flex-start}
+body.adm-full .adm-body{font-size:15px}
+body.adm-full .imgs .th img{width:84px;height:84px}
+body.adm-full .gal-sort{max-height:52vh}
+@media(min-width:900px){body.adm-full .adm details .in{display:grid;grid-template-columns:1fr 1fr;column-gap:22px}
+  body.adm-full .adm details .in>:is(.imgf,label:has(textarea)){grid-column:1/-1}}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;border-bottom:1px solid var(--line)}
 .tabs button{font-family:var(--mono);font-size:11.5px;padding:6px 10px;border-radius:6px;border:1px solid var(--line2);background:none;color:var(--mute)}
 .tabs button.on{border-color:var(--neon);color:#ffffff;background:var(--neon);font-weight:700}
@@ -843,7 +857,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
 
 <button class="btn solid sm" id="fab">⚙ Edit site</button>
 <aside class="adm" id="adm" aria-label="Admin editor">
-  <div class="adm-top">⚡ CONTROL PANEL <span id="status">ready</span><button id="admClose" title="Close">✕</button></div>
+  <div class="adm-top">⚡ CONTROL PANEL <span id="status">ready</span><button id="admFull" class="fs" type="button" title="Full screen" aria-label="Full screen" aria-pressed="false"><svg class="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="i-norm" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button><button id="admClose" title="Close">✕</button></div>
   <div class="adm-pub" id="admPub"></div>
   <div class="tabs" id="tabs"></div>
   <div class="adm-body" id="admBody"></div>
@@ -1583,6 +1597,14 @@ function pubNote(){
 function openAdmin(){ document.body.classList.add("adm-open"); renderTabs(); renderTab(); pubNote(); }
 $("#fab").onclick = openAdmin;
 $("#admClose").onclick = () => document.body.classList.remove("adm-open");
+/* full screen / normal panel toggle, remembered on this device */
+(() => {
+  const b = $("#admFull");
+  const set = on => { document.body.classList.toggle("adm-full", on); b.title = on ? "Normal size" : "Full screen"; b.setAttribute("aria-label", b.title); b.setAttribute("aria-pressed", String(on)); };
+  let on = false; try{ on = localStorage.getItem("admFull") === "1"; }catch(e){}
+  set(on);
+  b.onclick = () => { const v = !document.body.classList.contains("adm-full"); set(v); try{ localStorage.setItem("admFull", v ? "1" : "0"); }catch(e){} };
+})();
 
 function renderTabs(){ $("#tabs").innerHTML = Object.entries(SCHEMA).map(([k, v]) => `<button data-tab="${k}" class="${k === tab ? "on" : ""}">${v.label}</button>`).join(""); }
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b){ tab = b.dataset.tab; openIdx = -1; renderTabs(); renderTab(); } });
