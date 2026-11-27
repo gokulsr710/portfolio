@@ -1246,15 +1246,6 @@ function render(){
     out.push(`<section id="projects"><div class="wrap">${head("projects", "Projects")}${groups}</div></section>`);
   }
 
-  /* channels */
-  const chans = s.channels.map(c => chanCard(c, s.social)).filter(Boolean);
-  if(chans.length){
-    nav.push(["channels", "Channels"]);
-    out.push(`<section id="channels"><div class="wrap">${head("channels", "Channels")}
-      <div class="chgrid"><div class="chrow">${chans.filter(h => !h.includes("ch-yt")).join("")}</div>${chans.filter(h => h.includes("ch-yt")).join("")}</div>
-    </div></section>`);
-  }
-
   /* gallery */
   if(s.gallery.length){
     nav.push(["classes", "Classes"]);
@@ -1264,6 +1255,15 @@ function render(){
       ${gc.length > 2 ? `<div class="filters rv">${gc.map(c => `<button data-gf="${esc(c)}" class="${c === galFilter ? "on" : ""}">${esc(c)}</button>`).join("")}</div>` : ""}
       <div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous photos">‹</button><div class="gal" data-loop>${(list => list + list.replace(/<figure /g, '<figure class="dup" aria-hidden="true" '))(s.gallery.filter(x => galFilter === "All" || x.category === galFilter).map(x =>
         `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" loading="lazy" decoding="async"${x.w && x.h ? ` width="${+x.w}" height="${+x.h}"` : ""} src="${esc(thumbOf(x.image) || img(x.image, "add photo"))}" data-full="${esc(img(x.image, "add photo"))}" onerror="this.onerror=null;this.src=this.dataset.full" alt="">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join(""))}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
+    </div></section>`);
+  }
+
+  /* channels */
+  const chans = s.channels.map(c => chanCard(c, s.social)).filter(Boolean);
+  if(chans.length){
+    nav.push(["channels", "Channels"]);
+    out.push(`<section id="channels"><div class="wrap">${head("channels", "Channels")}
+      <div class="chgrid"><div class="chrow">${chans.filter(h => !h.includes("ch-yt")).join("")}</div>${chans.filter(h => h.includes("ch-yt")).join("")}</div>
     </div></section>`);
   }
 
