@@ -563,7 +563,15 @@ body:has(#power){overflow:hidden}
 #power .lift{filter:url(#pwSh)}
 .pw-vc text{font-family:var(--mono);fill:#7df9ff;filter:drop-shadow(0 0 2px rgba(125,249,255,.75));display:none}
 #power.on .pw-vc text{display:inline}
-@media(max-width:760px){#power svg{width:80vw;margin-right:16vw}}
+@media(max-width:760px){
+  /* phones: the USB-C port moves to the bottom edge of the board and the cable hangs straight down */
+  #power{justify-content:flex-start;padding-top:12vh}
+  #power svg{width:92vw;margin:0}
+  #power .pw-usb{transform:translate(400px,331px) rotate(90deg) translate(-532px,-195px)}
+  #power .pw-rpads{display:none}
+  #power .pw-cta{transform-box:fill-box;transform-origin:center;transform:translate(-14px,-26px) rotate(-90deg)}
+  #power .pw-hint{margin-top:42vw}
+}
 #pwPlug{transform:translateX(64px);transition:transform .25s cubic-bezier(.3,1.3,.6,1);cursor:grab;outline:none}
 #pwPlug.drag{transition:none;cursor:grabbing}
 #power:not(.plugged) #pwPlug:not(.drag) .pw-nudge{animation:nudgeX 1.6s ease-in-out infinite}
@@ -698,7 +706,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
 
     <circle cx="46" cy="46" r="10" fill="url(#pwGold)"/><circle cx="46" cy="46" r="5.5" fill="#06080a"/><circle cx="514" cy="46" r="10" fill="url(#pwGold)"/><circle cx="514" cy="46" r="5.5" fill="#06080a"/><circle cx="46" cy="314" r="10" fill="url(#pwGold)"/><circle cx="46" cy="314" r="5.5" fill="#06080a"/><circle cx="514" cy="314" r="10" fill="url(#pwGold)"/><circle cx="514" cy="314" r="5.5" fill="#06080a"/>
 
-    <circle cx="506" cy="186" r="3.4" fill="url(#pwGold)"/><circle cx="506" cy="186" r="2.0" fill="url(#pwTin)"/><circle cx="506" cy="204" r="3.4" fill="url(#pwGold)"/><circle cx="506" cy="204" r="2.0" fill="url(#pwTin)"/><circle cx="526" cy="162" r="4" fill="url(#pwGold)"/><circle cx="526" cy="162" r="2.3" fill="url(#pwTin)"/><circle cx="526" cy="228" r="4" fill="url(#pwGold)"/><circle cx="526" cy="228" r="2.3" fill="url(#pwTin)"/>
+    <g class="pw-rpads"><circle cx="506" cy="186" r="3.4" fill="url(#pwGold)"/><circle cx="506" cy="186" r="2.0" fill="url(#pwTin)"/><circle cx="506" cy="204" r="3.4" fill="url(#pwGold)"/><circle cx="506" cy="204" r="2.0" fill="url(#pwTin)"/><circle cx="526" cy="162" r="4" fill="url(#pwGold)"/><circle cx="526" cy="162" r="2.3" fill="url(#pwTin)"/><circle cx="526" cy="228" r="4" fill="url(#pwGold)"/><circle cx="526" cy="228" r="2.3" fill="url(#pwTin)"/></g>
 
     <!-- U1 DIP-28 -->
     <circle cx="304" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="304" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="304" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="304" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="302.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="302.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="312" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="312" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="312" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="312" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="310.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="310.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="320" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="320" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="320" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="320" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="318.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="318.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="328" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="328" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="328" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="328" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="326.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="326.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="336" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="336" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="336" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="336" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="334.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="334.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="344" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="344" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="344" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="344" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="342.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="342.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="352" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="352" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="352" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="352" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="350.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="350.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="360" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="360" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="360" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="360" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="358.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="358.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="368" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="368" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="368" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="368" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="366.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="366.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="376" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="376" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="376" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="376" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="374.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="374.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="384" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="384" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="384" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="384" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="382.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="382.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="392" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="392" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="392" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="392" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="390.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="390.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="400" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="400" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="400" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="400" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="398.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="398.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><circle cx="408" cy="94" r="3.6" fill="url(#pwGold)"/><circle cx="408" cy="94" r="2.1" fill="url(#pwTin)"/><circle cx="408" cy="146" r="3.6" fill="url(#pwGold)"/><circle cx="408" cy="146" r="2.1" fill="url(#pwTin)"/><rect x="406.4" y="94" width="3.2" height="12" fill="url(#pwTin)"/><rect x="406.4" y="134" width="3.2" height="12" fill="url(#pwTin)"/><rect x="298" y="107" width="116" height="32" rx="2" fill="#050506"/><rect class="lift" x="298" y="104" width="116" height="32" rx="2" fill="url(#pwChip)"/><path d="M299 104.8H413" stroke="#fff" stroke-opacity=".2"/><path d="M298 114a6 6 0 0 1 0 12" fill="#0a0b0d"/><circle cx="306" cy="129" r="2" fill="#000" opacity=".6"/><text x="358" y="119" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#8d939b">GR-328P</text><text x="358" y="129" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#6a7078">2611 · DIP-28</text>
@@ -780,6 +788,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
     <path d="M90 273h40" stroke="#fff" stroke-opacity=".08" stroke-width="2"/>
     <text x="64" y="261" font-family="IBM Plex Mono,monospace" font-size="9" fill="#eef5ee" fill-opacity=".85">DS2</text>
 
+    <g class="pw-usb">
     <!-- USB-C cable plug, coming in from the right -->
     <g id="pwPlug" tabindex="0" role="button" aria-label="Plug in the USB cable to open the website">
       <g class="pw-nudge">
@@ -834,6 +843,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
     <rect x="543" y="168" width="5" height="54" rx="2" fill="#8c939b"/>
     <path d="M543.6 169V221" stroke="#fff" stroke-opacity=".6" stroke-width=".8"/>
     <path d="M547.4 171V219" stroke="#0b0c0e" stroke-width="1.4"/>
+    </g>
   </svg>
   <p class="pw-hint"></p>
 </div>
@@ -1882,6 +1892,7 @@ addEventListener("resize", jrProgress);
   const pw = $("#power"); if(!pw) return;
   const plug = $("#pwPlug"), svg = $("svg", pw), L1 = $("#pwL1"), L2 = $("#pwL2"), L3 = $("#pwL3"), GAP = 64;
   let done = false, x0 = null, off = 0;
+  const vert = () => matchMedia("(max-width: 760px)").matches;   /* phones: port on the bottom edge, plug moves up */
 
   /* Visitor counter (free hitscounter.dev API, fast and CORS-enabled).
      Counted once per browser session; repeat views in the same session reuse the stored number.
@@ -1928,12 +1939,12 @@ addEventListener("resize", jrProgress);
   };
   plug.addEventListener("pointerdown", e => {
     if(done) return;
-    x0 = e.clientX; off = 0; plug.setPointerCapture(e.pointerId); plug.classList.add("drag");
+    x0 = vert() ? e.clientY : e.clientX; off = 0; plug.setPointerCapture(e.pointerId); plug.classList.add("drag");
   });
   plug.addEventListener("pointermove", e => {
     if(x0 === null) return;
     const k = 560 / svg.getBoundingClientRect().width;
-    off = Math.max(-GAP, Math.min(0, (e.clientX - x0) * k));
+    off = Math.max(-GAP, Math.min(0, ((vert() ? e.clientY : e.clientX) - x0) * k));
     plug.style.transform = `translateX(${GAP + off}px)`;
     if(off <= -GAP + 2){ x0 = null; plugIn(); }
   });
