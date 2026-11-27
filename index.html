@@ -1228,7 +1228,7 @@ function render(){
     out.push(`<section id="classes"><div class="wrap">${head("classes", "Classes & Workshops")}
       ${gc.length > 2 ? `<div class="filters rv">${gc.map(c => `<button data-gf="${esc(c)}" class="${c === galFilter ? "on" : ""}">${esc(c)}</button>`).join("")}</div>` : ""}
       <div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous photos">‹</button><div class="gal" data-loop>${(list => list + list.replace(/<figure /g, '<figure class="dup" aria-hidden="true" '))(s.gallery.filter(x => galFilter === "All" || x.category === galFilter).map(x =>
-        `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" loading="lazy"${x.w && x.h ? ` width="${+x.w}" height="${+x.h}"` : ""} src="${esc(img(x.image, "add photo"))}" alt="">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join(""))}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
+        `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" loading="lazy" decoding="async"${x.w && x.h ? ` width="${+x.w}" height="${+x.h}"` : ""} src="${esc(thumbOf(x.image) || img(x.image, "add photo"))}" data-full="${esc(img(x.image, "add photo"))}" onerror="this.onerror=null;this.src=this.dataset.full" alt="">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join(""))}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
     </div></section>`);
   }
 
@@ -1346,6 +1346,7 @@ document.addEventListener("keydown", e => {
   if($("#lb").classList.contains("open") && lbSet.length > 1 && (e.key === "ArrowLeft" || e.key === "ArrowRight")){ lbShow(lbIdx + (e.key === "ArrowRight" ? 1 : -1)); }
 });
 document.addEventListener("keydown", e => {if(e.key === "Escape"){ lbClose(); $("#gate").classList.remove("open"); }});
+setInterval(warmGallery, 1000);
 function route(){ const on = location.hash === "#links"; document.body.classList.toggle("links-mode", on); if(on) scrollTo(0, 0); }
 addEventListener("hashchange", route); addEventListener("popstate", route);
 /* section transition: a wipe sweeps over the page while it jumps to the chosen section */
@@ -1360,6 +1361,18 @@ document.addEventListener("click", e => {
   clearTimeout(wipeT); wipeT = setTimeout(go, 250);
   w.onanimationend = () => w.classList.remove("go");
 });
+
+/* small copy of a gallery photo for the strip: images/NAME.ext -> images/thumbs/NAME.jpg */
+function thumbOf(p){ const m = /^images\/([^/]+)\.(jpe?g|png|webp)$/i.exec(p || ""); return m ? `images/thumbs/${m[1]}.jpg` : ""; }
+
+/* start loading the strip's photos a little before the section scrolls into view (not one by one as they roll in) */
+function warmGallery(){
+  const sec = document.getElementById("classes"); if(!sec || sec._warm) return; sec._warm = true;
+  const go = () => $$("#classes .gal img").forEach(im => { im.loading = "eager"; });
+  if(!("IntersectionObserver" in window)){ go(); return; }
+  const io = new IntersectionObserver(es => { if(es.some(e => e.isIntersecting)){ io.disconnect(); go(); } }, {rootMargin: "1200px 0px"});
+  io.observe(sec);
+}
 
 /* rolling strips (photos, content): roll by themselves, pause on hover, drag or use arrows to slide */
 let rollHold = 0, drag = null, dragged = false;
@@ -1390,9 +1403,9 @@ setInterval(() => {
     if(t._target != null && !drag){ const d = t._target - t.scrollLeft; if(Math.abs(d) < 2){ t._target = null; t._hold = Date.now() + 1500; } else t.scrollLeft += Math.sign(d) * Math.max(2, Math.min(26, Math.abs(d) / 5)); continue; }
     if(rm || drag || Date.now() < Math.max(rollHold, t._hold || 0) || t.matches(":hover")) continue;
     const max = t.scrollWidth - t.clientWidth; if(max <= 0) continue;
-    if(loopHalf(t)){ t.scrollLeft += (t._dir || 1) < 0 ? -1 : 1; continue; }
+    if(loopHalf(t)){ t.scrollLeft += (t._dir || 1) < 0 ? -2 : 2; continue; }
     t._dir ||= 1; if(t.scrollLeft >= max - 1) t._dir = -1; else if(t.scrollLeft <= 0) t._dir = 1;
-    t.scrollLeft += t._dir;
+    t.scrollLeft += t._dir * 2;
   }
 }, 25);
 document.addEventListener("pointerdown", e => { const t = e.target.closest(".gal"); if(t && e.pointerType === "mouse") drag = {x: e.clientX, s: t.scrollLeft, t}; });
@@ -1504,6 +1517,9 @@ function ghRepo(){
 }
 function pubMsg(t){ $$("#pubMsg, #admPub .pubmsg").forEach(el => el.textContent = t); }
 let publishing = false;
+function thumbData(src){ return new Promise((res, rej) => { const im = new Image(); im.onerror = rej; im.onload = () => {
+  const k = Math.min(1, 600 / im.height), c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+  c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL("image/jpeg", .74)); }; im.src = src; }); }
 async function publish(){
   if(publishing) return;
   const tok = ghToken(), repo = ghRepo();
@@ -1525,6 +1541,11 @@ async function publish(){
         if(m){ const ext = EXT[m[1]] || m[1].split("/")[1], path = `${m[2] === "video" ? "videos" : "images"}/up-${cyrb(m[3], 11)}.${ext}`; files.set(path, m[3]); o[k] = path; } }
       else if(v && typeof v === "object") walk(v); } };
     walk(out);
+    /* new gallery photos also get a small thumbnail for the rolling strip */
+    for(const [i, g] of (state.gallery || []).entries()){
+      const m = /^data:image\/[\w.+-]+;base64,/.test(g.image || "") && thumbOf(out.gallery[i].image); if(!m || files.has(m)) continue;
+      try{ files.set(m, (await thumbData(g.image)).split(",")[1]); }catch(e){}
+    }
     const json = JSON.stringify(out);
     pubMsg("Connecting to GitHub…"); step = "read";
     const ref = await api("/git/ref/heads/main"), base = await api(`/git/commits/${ref.object.sha}`);
