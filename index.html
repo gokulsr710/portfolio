@@ -502,6 +502,13 @@ body.adm-open .adm{transform:none}
 .imgs .th img{width:64px;height:64px;object-fit:cover}
 .imgs .x{position:absolute;top:3px;right:3px;width:20px;height:20px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;font-size:14px;line-height:20px;cursor:pointer}
 .imgs .x:hover{background:var(--red)}
+.imgs[data-sort] .th{cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .15s}
+.imgs[data-sort] .th img{pointer-events:none;-webkit-user-drag:none}
+.imgs .th.lift{opacity:.35;outline:2px dashed var(--neon);outline-offset:2px}
+.imgs .th i{position:absolute;left:3px;bottom:3px;min-width:16px;padding:0 3px;border-radius:4px;background:rgba(0,0,0,.7);color:#fff;font:600 10px/15px var(--mono);font-style:normal;text-align:center;pointer-events:none}
+#sortGhost{position:fixed;z-index:2147483600;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:8px;overflow:hidden;pointer-events:none;box-shadow:0 10px 26px rgba(0,0,0,.6);outline:2px solid var(--neon);transform:rotate(-4deg) scale(1.06)}
+#sortGhost img{width:100%;height:100%;object-fit:cover}
+.gal-sort{max-height:340px;overflow:auto;padding:4px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
 .vids{display:flex;flex-direction:column;gap:6px;margin:6px 0 8px}
 .vrow{position:relative;display:flex;align-items:center;gap:10px;padding:5px 34px 5px 6px;border:1px solid var(--line2);border-radius:6px;background:#080a0f;font-size:13px}
 .vrow img{width:48px;height:36px;object-fit:cover;border-radius:4px;border:0}
@@ -1220,8 +1227,8 @@ function render(){
     if(!gc.includes(galFilter)) galFilter = "All";
     out.push(`<section id="classes"><div class="wrap">${head("classes", "Classes & Workshops")}
       ${gc.length > 2 ? `<div class="filters rv">${gc.map(c => `<button data-gf="${esc(c)}" class="${c === galFilter ? "on" : ""}">${esc(c)}</button>`).join("")}</div>` : ""}
-      <div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous photos">‹</button><div class="gal">${s.gallery.filter(x => galFilter === "All" || x.category === galFilter).map(x =>
-        `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" loading="lazy"${x.w && x.h ? ` width="${+x.w}" height="${+x.h}"` : ""} src="${esc(img(x.image, "add photo"))}" alt="">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join("")}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
+      <div class="roll rv"><button class="rb l" data-roll="-1" aria-label="Previous photos">‹</button><div class="gal" data-loop>${(list => list + list.replace(/<figure /g, '<figure class="dup" aria-hidden="true" '))(s.gallery.filter(x => galFilter === "All" || x.category === galFilter).map(x =>
+        `<figure data-lb="${esc(img(x.image, "add photo"))}" data-cap=""><img draggable="false" loading="lazy"${x.w && x.h ? ` width="${+x.w}" height="${+x.h}"` : ""} src="${esc(img(x.image, "add photo"))}" alt="">${x.category ? `<figcaption><small>${esc(x.category)}</small></figcaption>` : ""}</figure>`).join(""))}</div><button class="rb r" data-roll="1" aria-label="Next photos">›</button></div>
     </div></section>`);
   }
 
@@ -1284,7 +1291,7 @@ document.addEventListener("click", e => {
   const gf = e.target.closest("[data-gf]");
   if(gf){ galFilter = gf.dataset.gf; const y = scrollY; render(); $$("#classes .rv").forEach(x => x.classList.add("in")); scrollTo(0, y); return; }
   const rb = e.target.closest("[data-roll]");
-  if(rb){ const t = rb.parentNode.querySelector(".gal"), d = +rb.dataset.roll; t._dir = d; t._target = Math.max(0, Math.min(t.scrollWidth - t.clientWidth, t.scrollLeft + d * t.clientWidth * .7)); return; }
+  if(rb){ const t = rb.parentNode.querySelector(".gal"), d = +rb.dataset.roll, to = t.scrollLeft + d * t.clientWidth * .7; t._dir = d; t._target = loopHalf(t) ? to : Math.max(0, Math.min(t.scrollWidth - t.clientWidth, to)); return; }
   const ps = e.target.closest("[data-pstep]");
   if(ps){ const m = ps.closest(".prj-media"); projPic(m, +m.dataset.pi + +ps.dataset.pstep); return; }
   const ls = e.target.closest("[data-lbstep]");
@@ -1356,12 +1363,34 @@ document.addEventListener("click", e => {
 
 /* rolling strips (photos, content): roll by themselves, pause on hover, drag or use arrows to slide */
 let rollHold = 0, drag = null, dragged = false;
+/* Looping strips hold two copies of the photos. Width of one copy = distance between the first photo and its copy. */
+function loopHalf(t){
+  if(!t.hasAttribute("data-loop")) return 0;
+  const a = t.firstElementChild, b = t.querySelector(".dup");
+  const h = a && b ? b.offsetLeft - a.offsetLeft : 0;
+  return h > t.clientWidth ? h : 0;   /* too few photos to fill the strip: behave like a normal strip */
+}
+/* Keep the scroll position inside the middle: jumping by exactly one copy looks identical, so the loop never ends. */
+function loopWrap(t){
+  const h = loopHalf(t); if(!h) return;
+  let shift = 0;
+  if(t.scrollLeft >= h + 1) shift = -h; else if(t.scrollLeft < 1) shift = h;
+  if(!shift) return;
+  t.scrollLeft += shift;
+  if(t._target != null) t._target += shift;
+  if(drag && drag.t === t) drag.s += shift;
+}
 setInterval(() => {
   const rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   for(const t of $$(".gal")){
+    if(loopHalf(t)){
+      if(!t._init){ t._init = true; t.scrollLeft = 2; }
+      loopWrap(t);
+    }
     if(t._target != null && !drag){ const d = t._target - t.scrollLeft; if(Math.abs(d) < 2){ t._target = null; t._hold = Date.now() + 1500; } else t.scrollLeft += Math.sign(d) * Math.max(2, Math.min(26, Math.abs(d) / 5)); continue; }
     if(rm || drag || Date.now() < Math.max(rollHold, t._hold || 0) || t.matches(":hover")) continue;
     const max = t.scrollWidth - t.clientWidth; if(max <= 0) continue;
+    if(loopHalf(t)){ t.scrollLeft += (t._dir || 1) < 0 ? -1 : 1; continue; }
     t._dir ||= 1; if(t.scrollLeft >= max - 1) t._dir = -1; else if(t.scrollLeft <= 0) t._dir = 1;
     t.scrollLeft += t._dir;
   }
@@ -1370,6 +1399,7 @@ document.addEventListener("pointerdown", e => { const t = e.target.closest(".gal
 document.addEventListener("pointermove", e => { if(!drag) return; const dx = e.clientX - drag.x; if(Math.abs(dx) > 5){ dragged = true; drag.t.classList.add("drag"); } drag.t.scrollLeft = drag.s - dx; });
 document.addEventListener("pointerup", () => { if(!drag) return; drag.t.classList.remove("drag"); drag = null; setTimeout(() => dragged = false, 0); });
 addEventListener("touchstart", e => { if(e.target.closest(".gal")) rollHold = Date.now() + 4000; }, {passive: true});
+document.addEventListener("scroll", e => { const t = e.target; if(t.classList && t.classList.contains("gal") && !t._target) loopWrap(t); }, {capture: true, passive: true});
 
 /* =====================================================================
    CANVAS — PCB traces with current pulses + oscilloscope
@@ -1547,7 +1577,7 @@ function field(f, val, path){
       <div class="row" style="flex-wrap:wrap"><input type="text" class="vidurl" placeholder="Paste a YouTube or .mp4 link" style="flex:1;min-width:180px"><button type="button" class="btn sm" data-vidadd="${path}">Add link</button><label class="btn sm" style="margin:0;display:inline-flex">Upload video<input type="file" accept="video/*" multiple data-vids="${path}" hidden></label></div>
       <p class="hint" style="margin:4px 0 0">Uploaded clips are stored inside your data file, so keep them short (under 25 MB each). Longer videos work best as a YouTube link.</p></div>`; }
   if(f.t === "imgs"){ const arr = Array.isArray(val) ? val : [];
-    return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="imgs">${arr.map((v, j) => `<span class="th"><img src="${esc(img(v, "none"))}" alt=""><button type="button" class="x" data-imgdel="${path}" data-j="${j}" title="Remove this image">×</button></span>`).join("")}</div><label class="btn sm" style="margin:0;display:inline-flex">+ Add photos<input type="file" accept="image/*" multiple data-imgs="${path}" hidden></label>${arr.length ? `<span class="hint" style="margin-left:10px">${arr.length} photo${arr.length === 1 ? "" : "s"}</span>` : ""}</div>`; }
+    return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="imgs" data-sort="${path}">${arr.map((v, j) => `<span class="th" data-j="${j}"><img src="${esc(img(v, "none"))}" alt="" draggable="false"><i>${j + 1}</i><button type="button" class="x" data-imgdel="${path}" data-j="${j}" title="Remove this image">×</button></span>`).join("")}</div>${arr.length > 1 ? `<p class="hint" style="margin:-4px 0 8px">Drag photos to change their order (on phones: press and hold, then drag). Photo 1 is the cover.</p>` : ""}<label class="btn sm" style="margin:0;display:inline-flex">+ Add photos<input type="file" accept="image/*" multiple data-imgs="${path}" hidden></label>${arr.length ? `<span class="hint" style="margin-left:10px">${arr.length} photo${arr.length === 1 ? "" : "s"}</span>` : ""}</div>`; }
   if(f.t === "img") return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="row"><img src="${esc(img(val, "none"))}" alt=""><label class="btn sm" style="margin:0">Upload<input type="file" accept="image/*" data-img="${path}" hidden></label>${val ? `<button class="btn sm copper" data-clear="${path}">Remove</button>` : ""}</div><input type="text" ${a} placeholder="…or paste an image URL" value="${esc(/^data:/.test(val || "") ? "" : val)}"></div>`;
   return `<label>${f.label}<input type="text" ${a} value="${esc(val)}"${f === SCHEMA[tab].fields[0] && SCHEMA[tab].list ? " data-title" : ""}></label>`;
 }
@@ -1593,6 +1623,9 @@ function renderTab(){
       <button data-act="up" data-i="${i}" title="Move up">↑</button><button data-act="down" data-i="${i}" title="Move down">↓</button><button class="del" data-act="del" data-i="${i}" title="Delete">✕</button></summary>
       <div class="in">${sc.fields.map(f => field(f, it[f.k], `${tab}.${i}.${f.k}`)).join("")}</div></details>`).join("");
     h += `<button class="btn sm solid" data-act="add">+ Add ${sc.label.replace(/s$/, "").toLowerCase()}</button>`;
+    if(tab === "gallery" && arr.length > 1) h = `<h4>Arrange photos</h4>
+      <p class="hint">Drag a photo to a new spot to change the order on the site (on phones: press and hold, then drag).</p>
+      <div class="imgs gal-sort" data-sort="gallery">${arr.map((it, j) => `<span class="th" data-j="${j}" title="${esc(it.caption || "")}"><img loading="lazy" src="${esc(img(it.image, "none"))}" alt="" draggable="false"><i>${j + 1}</i></span>`).join("")}</div><hr>` + h;
     if(tab === "gallery") h += `<hr><h4>Add many at once</h4>
       <p class="hint">Pick several photos together. Each one becomes its own entry, captioned from its file name, in the category below. You can rename them afterwards.</p>
       <label>Category for these photos<input type="text" id="bulkCat" value="Classes"></label>
@@ -1691,6 +1724,60 @@ adm.addEventListener("click", e => {
   else return;
   renderTab(); changed();
 });
+
+/* ---------- editor: drag-to-rearrange photo grids ----------
+   Mouse: press and drag. Touch: press and hold ~0.3s, then drag (a quick swipe still scrolls the panel). */
+(() => {
+  let s = null;   /* {box, el, id, x, y, ghost, on, holdT} */
+  const begin = () => {
+    if(!s || s.on) return; s.on = true;
+    s.el.classList.add("lift");
+    const g = document.createElement("div"); g.id = "sortGhost"; g.innerHTML = s.el.querySelector("img").outerHTML; document.body.appendChild(g); s.ghost = g;
+    g.style.left = s.x + "px"; g.style.top = s.y + "px";
+    if(navigator.vibrate) try{ navigator.vibrate(15); }catch(e){}
+  };
+  const move = (x, y) => {
+    s.x = x; s.y = y; if(!s.on) return;
+    s.ghost.style.left = x + "px"; s.ghost.style.top = y + "px";
+    const over = document.elementFromPoint(x, y), th = over && over.closest(".th");
+    if(th && th !== s.el && th.parentNode === s.box){
+      const r = th.getBoundingClientRect(), after = x > r.left + r.width / 2;
+      s.box.insertBefore(s.el, after ? th.nextSibling : th);
+    }
+    const br = s.box.getBoundingClientRect();   /* auto-scroll a scrollable grid near its edges */
+    if(y < br.top + 30) s.box.scrollTop -= 8; else if(y > br.bottom - 30) s.box.scrollTop += 8;
+  };
+  const end = () => {
+    if(!s) return; clearTimeout(s.holdT);
+    const st = s; s = null;
+    if(!st.on) return;
+    st.el.classList.remove("lift"); st.ghost.remove();
+    const order = [...st.box.children].map(c => +c.dataset.j);
+    if(order.every((j, i) => j === i)) return;
+    const arr = getPath(st.box.dataset.sort); if(!Array.isArray(arr)) return;
+    const next = order.map(j => arr[j]); arr.splice(0, arr.length, ...next);
+    renderTab(); changed();
+  };
+  adm.addEventListener("pointerdown", e => {
+    const th = e.target.closest(".imgs[data-sort] .th"); if(!th || e.target.closest(".x") || e.button > 0) return;
+    s = {box: th.parentNode, el: th, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, on: false};
+    if(e.pointerType === "mouse") e.preventDefault();
+    else s.holdT = setTimeout(begin, 300);
+  });
+  addEventListener("pointermove", e => {
+    if(!s) return;
+    if(!s.on){
+      const far = Math.abs(e.clientX - s.sx) + Math.abs(e.clientY - s.sy) > 6;
+      if(e.pointerType === "mouse"){ if(far) begin(); }
+      else if(far){ clearTimeout(s.holdT); s = null; return; }   /* finger moved before the hold: it's a scroll */
+    }
+    move(e.clientX, e.clientY);
+  });
+  addEventListener("touchmove", e => { if(s && s.on && e.cancelable) e.preventDefault(); }, {passive: false});
+  addEventListener("pointerup", end);
+  addEventListener("pointercancel", () => { if(s && !s.on){ clearTimeout(s.holdT); s = null; } else end(); });
+  adm.addEventListener("contextmenu", e => { if(e.target.closest(".imgs[data-sort]")) e.preventDefault(); });
+})();
 
 /* ---------- project row arrows ---------- */
 document.addEventListener("click", e => {
