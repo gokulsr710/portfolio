@@ -569,14 +569,17 @@ body:has(#power){overflow:hidden}
   #power svg{width:92vw;margin:0}
   #power .pw-usb{transform:translate(400px,331px) rotate(90deg) translate(-532px,-195px)}
   #power .pw-rpads{display:none}
+  #power .pw-arD{display:none}
+  #power .pw-arL{display:inline}
   #power .pw-cta{transform-box:fill-box;transform-origin:center;transform:translate(-14px,-26px) rotate(-90deg)}
-  #power .pw-hint{margin-top:42vw}
+  #power .pw-hint{order:-1;margin:0 0 14px}
 }
 #pwPlug{transform:translateX(64px);transition:transform .25s cubic-bezier(.3,1.3,.6,1);cursor:grab;outline:none}
 #pwPlug.drag{transition:none;cursor:grabbing}
 #power:not(.plugged) #pwPlug:not(.drag) .pw-nudge{animation:nudgeX 1.6s ease-in-out infinite}
 @keyframes nudgeX{50%{transform:translateX(-9px)}}
 .pw-cta{transition:opacity .2s}
+.pw-arL{display:none}
 #power.plugged .pw-cta{opacity:0}
 .pw-d2{fill:#24402a;transition:fill .1s}
 #power.go .pw-d2{fill:#b6f24a;filter:drop-shadow(0 0 4px #a3e635) drop-shadow(0 0 8px #a3e635)}
@@ -795,7 +798,8 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
         <g class="pw-cta" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="11" letter-spacing="1.5" fill="#a3e635" text-anchor="middle">
           <text x="576" y="148">CONNECT</text>
           <text x="576" y="162">THE CABLE</text>
-          <path d="M576 166v6m-3.5-3.5 3.5 3.5 3.5-3.5" fill="none" stroke="#a3e635" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="pw-arD" d="M576 166v6m-3.5-3.5 3.5 3.5 3.5-3.5" fill="none" stroke="#a3e635" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="pw-arL" d="M538 153h-12m4-4-4 4 4 4" fill="none" stroke="#a3e635" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
         <!-- cast shadow on the table -->
         <path d="M556 226H640C700 216 712 292 774 394" fill="none" stroke="#000" stroke-opacity=".55" stroke-width="18" stroke-linecap="round" filter="url(#pwBlur)"/>
@@ -804,6 +808,12 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
         <path d="M638 195C700 195 706 270 760 380" fill="none" stroke="#1d1f22" stroke-width="11" stroke-linecap="round"/>
         <path d="M638 192C698 192 704 266 757 375" fill="none" stroke="#4b5058" stroke-width="4.5" stroke-linecap="round" stroke-opacity=".85"/>
         <path d="M638 191C698 191 703 264 756 373" fill="none" stroke="#a9b0ba" stroke-width="1.3" stroke-linecap="round" stroke-opacity=".7"/>
+        <!-- cable continues well off-screen -->
+        <path d="M768 392C800 452 860 466 960 466L1500 466" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="18" stroke-linecap="round" filter="url(#pwBlur)"/>
+        <path d="M760 380C790 435 850 452 960 452L1500 452" fill="none" stroke="#050505" stroke-width="15" stroke-linecap="round"/>
+        <path d="M760 380C790 435 850 452 960 452L1500 452" fill="none" stroke="#1d1f22" stroke-width="11" stroke-linecap="round"/>
+        <path d="M757 375C787 431 848 449 960 449L1500 449" fill="none" stroke="#4b5058" stroke-width="4.5" stroke-linecap="round" stroke-opacity=".85"/>
+        <path d="M756 373C786 429 847 448 960 448L1500 448" fill="none" stroke="#a9b0ba" stroke-width="1.3" stroke-linecap="round" stroke-opacity=".7"/>
         <!-- tapered strain-relief boot with flex ridges -->
         <path d="M600 176C616 177 628 184 644 187V203C628 206 616 213 600 214Z" fill="url(#pwBoot)"/>
         <g stroke="#000" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"><path d="M608 178.5V211.5"/><path d="M615 180.5V209.5"/><path d="M622 183V207"/><path d="M629 184.8V205.2"/><path d="M636 186.2V203.8"/></g>
