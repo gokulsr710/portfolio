@@ -478,6 +478,10 @@ body.adm-open .adm{transform:none}
 .adm-top #status{margin-left:auto;color:var(--mute);font-size:11px;letter-spacing:.04em}
 .adm-top button{background:none;border:1px solid var(--line2);border-radius:6px;width:30px;height:30px;color:var(--mute)}
 .adm-top button:hover{color:var(--red);border-color:var(--red)}
+.adm table.vis{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.adm table.vis th,.adm table.vis td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.adm table.vis th{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.adm table.vis td:first-child{white-space:nowrap;color:var(--mute)}
 .adm-top button.fs{display:grid;place-items:center;padding:0}
 .adm-top button.fs:hover{color:var(--neon);border-color:var(--neon)}
 .adm-top .fs svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -622,6 +626,7 @@ body:has(#power){overflow:hidden}
 #power.ask .pw-lcd{width:min(470px,92vw);margin:0;animation:pwIn .5s ease backwards}
 #power:not(.ask) svg{animation:pwIn .6s ease backwards}
 @keyframes pwIn{from{opacity:0;transform:translateY(14px) scale(.97)}}
+.pw-note{margin:8px 0 0;font:500 10.5px/1.4 var(--mono);letter-spacing:.04em;color:rgba(238,245,238,.62);text-align:center}
 .pw-lcd.shake{animation:pwShake .4s}
 @keyframes pwShake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 .pw-hint{margin-top:16px;font:500 13px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
@@ -722,6 +727,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
       <div class="pw-row"><span class="pw-gt" aria-hidden="true">&gt;</span><input id="pwName" maxlength="15" spellcheck="false" autocapitalize="characters" enterkeyhint="done" aria-label="Your name" placeholder="_"></div>
     </div></div>
     <div class="pw-lcdfoot"><span>LCD1602 · I²C</span><button type="submit" id="pwOk">OK ⏎</button></div>
+    <p class="pw-note">Your name and visit time are saved so Gokul can see who visited.</p>
   </form>
   <svg viewBox="0 0 560 360">
     <defs>
@@ -990,6 +996,7 @@ const DEFAULTS = {
   updatedAt: 0,
   passHash: DEFAULT_HASH,
   secQ: "", secHash: "",
+  visitLog: "",
   profile: {
     name: "Your Name", initials: "YN",
     title: "Electronics Engineer & Content Creator",
@@ -1097,6 +1104,7 @@ const SCHEMA = {
   links:{label:"Links", list:true, blank:{label:"New link",url:"https://",icon:"web"},
     hint:"These appear on the Links page (your link-tree).",
     fields:[{k:"label",label:"Label"},{k:"url",label:"URL / email / phone"},{k:"icon",label:"Icon",t:"sel",opts:Object.keys(ICONS)}]},
+  visitors:{label:"Visitors"},
   settings:{label:"⚙ Settings"}
 };
 
@@ -1736,8 +1744,70 @@ function field(f, val, path){
   if(f.t === "img") return `<div class="imgf"><span class="lab" style="margin:0">${f.label}</span><div class="row"><img src="${esc(img(val, "none"))}" alt=""><label class="btn sm" style="margin:0">Upload<input type="file" accept="image/*" data-img="${path}" hidden></label>${val ? `<button class="btn sm copper" data-clear="${path}">Remove</button>` : ""}</div><input type="text" ${a} placeholder="…or paste an image URL" value="${esc(/^data:/.test(val || "") ? "" : val)}"></div>`;
   return `<label>${f.label}<input type="text" ${a} value="${esc(val)}"${f === SCHEMA[tab].fields[0] && SCHEMA[tab].list ? " data-title" : ""}></label>`;
 }
+/* Google Apps Script that receives names (doPost) and lists them for the editor (doGet + secret key) */
+function visKey(){ let k = lsGet("visKey"); if(!k){ k = Array.from(crypto.getRandomValues(new Uint8Array(15)), x => x.toString(16).padStart(2, "0")).join(""); lsSet("visKey", k); } return k; }
+function visScript(){ return `// Portfolio visitor log. Paste into Extensions > Apps Script of a new Google Sheet.
+const KEY = "${visKey()}";   // lets your editor read the list; keep it private
+
+function doPost(e) {
+  let d = {};
+  try { d = JSON.parse(e.postData.contents || "{}"); } catch (err) {}
+  const safe = (v, n) => String(v || "").slice(0, n).replace(/^[=+\\-@]/, "'$&");
+  const name = safe(d.name, 20);
+  if (!name) return ContentService.createTextOutput("no name");
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try {
+    const sh = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    if (sh.getLastRow() === 0) sh.appendRow(["Date & time", "Name", "Device", "Visitor's local time"]);
+    sh.appendRow([new Date(), name, safe(d.device, 20), safe(d.local, 40)]);
+  } finally { lock.releaseLock(); }
+  return ContentService.createTextOutput("ok");
+}
+
+function doGet(e) {
+  const out = o => ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+  if ((e.parameter.key || "") !== KEY) return out({ error: "wrong key" });
+  const v = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0].getDataRange().getValues().slice(1);
+  return out({ rows: v.slice(-1000).reverse().map(r => [r[0] instanceof Date ? r[0].toISOString() : String(r[0]), r[1], r[2], r[3]]) });
+}
+`; }
+async function visLoad(){
+  const m = $("#visMsg"), box = $("#visList"), url = (state.visitLog || "").trim();
+  if(!url){ m.textContent = "Paste the web app link first."; return; }
+  m.textContent = "Loading…";
+  try{
+    const r = await fetch(url + (url.includes("?") ? "&" : "?") + "key=" + encodeURIComponent(visKey()), {cache: "no-store"});
+    const d = await r.json();
+    if(d.error){ m.textContent = d.error === "wrong key" ? "The key doesn't match the script. Paste the key from your script below, or copy the script again and redeploy." : d.error; box.innerHTML = ""; return; }
+    const rows = d.rows || [];
+    m.textContent = rows.length ? `${rows.length} visitor${rows.length === 1 ? "" : "s"}, newest first.` : "No visitors yet.";
+    const when = v => { const t = new Date(v); return isNaN(t) ? esc(v) : t.toLocaleString([], {day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"}); };
+    box.innerHTML = rows.length ? `<table class="vis"><thead><tr><th>Date &amp; time</th><th>Name</th><th>Device</th></tr></thead><tbody>${rows.map(x => `<tr><td>${when(x[0])}</td><td><b>${esc(x[1])}</b></td><td>${esc(x[2] || "")}</td></tr>`).join("")}</tbody></table>` : "";
+  }catch(e){ m.textContent = "Couldn't reach the sheet. Check the link (it should end in /exec) and that the deployment allows Anyone."; }
+}
 function renderTab(){
   const sc = SCHEMA[tab], b = $("#admBody");
+  if(tab === "visitors"){
+    const url = state.visitLog || "";
+    b.innerHTML = `<h4>Visitor names</h4>
+      <p class="hint">When someone types their name on the LCD and presses OK, their name, the date and time, and their device type are added to a Google Sheet that only you can open. The LCD tells visitors this.</p>
+      ${url ? `<div class="rowb"><button class="btn sm solid" data-act="visload">Show visitors</button></div><p class="hint" id="visMsg"></p><div id="visList"></div><hr>` : ""}
+      <details class="ghhelp" ${url ? "" : "open"}><summary>Set up the Google Sheet (one time, about 3 minutes)</summary><ol>
+        <li>Open <a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a> and name the sheet e.g. <i>Portfolio visitors</i>.</li>
+        <li>In the sheet: <b>Extensions → Apps Script</b>. Delete the sample code there.</li>
+        <li>Press <b>Copy script</b> below, paste it into Apps Script and press <b>Save</b> (💾).</li>
+        <li><b>Deploy → New deployment</b>. Click the ⚙ next to <i>Select type</i> and pick <b>Web app</b>. Set <b>Execute as: Me</b> and <b>Who has access: Anyone</b>, then <b>Deploy</b>.</li>
+        <li>Google asks you to allow access: choose your account, then <b>Advanced → Go to (project name) → Allow</b>. This lets the script add rows to your own sheet.</li>
+        <li>Copy the <b>Web app URL</b> (it ends in <code>/exec</code>), paste it below, then press <b>Publish now</b> in ⚙ Settings so the live site starts saving names.</li>
+      </ol>
+      <div class="rowb"><button class="btn sm solid" data-act="viscopy">Copy script</button></div>
+      <p class="hint" id="visCopyMsg"></p></details>
+      <label>Web app URL<input type="text" data-path="visitLog" value="${esc(url)}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false"></label>
+      <label>Key for reading the list on this device <input type="text" id="visKeyIn" value="${esc(visKey())}" autocomplete="off" spellcheck="false"></label>
+      <div class="rowb"><button class="btn sm" data-act="viskey">Save key</button></div>
+      <p class="hint">The key is in the first lines of your script (<code>const KEY</code>). It stays in this browser only. On another device, paste the same key here to see the list there. You can always open the Google Sheet itself too.</p>`;
+    return;
+  }
   if(tab === "settings"){
     const gt = ghToken();
     b.innerHTML = `<h4>Publish to the live site</h4>
@@ -1869,6 +1939,12 @@ adm.addEventListener("click", e => {
     if(!v){ pubMsg(rp ? "Repository saved." : "Paste a token first."); return; }
     if(!/^(github_pat_|ghp_)[\w]{20,}$/.test(v)){ pubMsg("That doesn't look like a GitHub token (they start with github_pat_ or ghp_)."); return; }
     lsSet("ghTok", v); renderTab(); pubMsg("Token saved on this device ✓"); return; }
+  else if(act === "visload"){ visLoad(); return; }
+  else if(act === "viscopy"){ const t = visScript(), m = $("#visCopyMsg");
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { m.textContent = "Script copied ✓ Paste it into Apps Script."; }, () => {
+      m.innerHTML = `Copy didn't work here. Select all of this and copy it:<textarea rows="8" readonly style="width:100%;font:12px var(--mono)">${esc(t)}</textarea>`; });
+    return; }
+  else if(act === "viskey"){ const v = ($("#visKeyIn").value || "").trim(); if(!/^[\w-]{8,}$/.test(v)){ alert("That key looks wrong. Copy it from the const KEY line of your script."); return; } lsSet("visKey", v); renderTab(); return; }
   else if(act === "ghforget"){ lsSet("ghTok", ""); renderTab(); pubMsg("Token removed from this device."); return; }
   else if(act === "publish"){ if($("#ghRepo")) lsSet("ghRepo", ($("#ghRepo").value || "").trim() || ghRepo()); publish(); return; }
   else if(act === "export"){ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(state)], {type: "application/json"})); a.download = "data.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); return; }
@@ -1961,7 +2037,7 @@ addEventListener("resize", jrProgress);
   const plug = $("#pwPlug"), svg = $("svg", pw), L1 = $("#pwL1"), L2 = $("#pwL2"), L3 = $("#pwL3"), GAP = 64;
   let done = false, x0 = null, off = 0;
 
-  /* name typed on the LCD: kept only in this browser, never sent anywhere */
+  /* name typed on the LCD: remembered in this browser, and logged (name + time) to the owner's Google Sheet */
   const nameIn = $("#pwName"), lcd = $("#pwLcd"), lcd1 = $("#pwLcd1");
   const clean = v => String(v || "").replace(/[^\p{L}\p{N} .'-]/gu, "").replace(/\s+/g, " ").trim().toUpperCase().slice(0, 15);
   try{ const v = localStorage.getItem("visName"); if(v) nameIn.value = clean(v); }catch(e){}
@@ -1975,10 +2051,20 @@ addEventListener("resize", jrProgress);
     const n = saveName();
     if(!n){ lcd1.textContent = "NAME PLEASE :)"; lcd.classList.remove("shake"); void lcd.offsetWidth; lcd.classList.add("shake"); nameIn.focus(); return; }
     lcd.classList.add("done"); nameIn.blur(); lcd1.textContent = "HELLO,";
+    logVisit(n);
     setTimeout(() => { pw.classList.remove("ask"); plug.focus({preventScroll: true}); }, 650);   /* step 2: the board */
   });
   nameIn.addEventListener("input", () => { lcd.classList.remove("done"); lcd1.textContent = "ENTER YOUR NAME:"; });
   const vert = () => matchMedia("(max-width: 760px)").matches;   /* phones: port on the bottom edge, plug moves up */
+  /* one log entry per name per browser session; skipped on localhost so testing doesn't fill the sheet */
+  const logVisit = (n, tries = 0) => {
+    const url = (state.visitLog || "").trim();
+    if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)){ if(tries < 4) setTimeout(() => logVisit(n, tries + 1), 1500); return; }
+    if(/^(localhost|127\.|\[::1\])/.test(location.hostname) && !/[?&]logtest/.test(location.search)) return;
+    try{ if(sessionStorage.getItem("visLogged") === n) return; sessionStorage.setItem("visLogged", n); }catch(e){}
+    const body = JSON.stringify({name: n, device: matchMedia("(pointer: coarse)").matches ? "Phone / tablet" : "Computer", local: new Date().toString().slice(0, 33)});
+    try{ fetch(url, {method: "POST", mode: "no-cors", keepalive: true, headers: {"Content-Type": "text/plain;charset=utf-8"}, body}).catch(() => {}); }catch(e){}
+  };
 
   /* Visitor counter (free hitscounter.dev API, fast and CORS-enabled).
      Counted once per browser session; repeat views in the same session reuse the stored number.
