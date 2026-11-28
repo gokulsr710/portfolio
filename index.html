@@ -565,7 +565,8 @@ body:has(#power){overflow:hidden}
 #power.on .pw-vc text{display:inline}
 @media(max-width:760px){
   /* phones: the USB-C port moves to the bottom edge of the board and the cable hangs straight down */
-  #power{justify-content:flex-start;padding-top:5vh}
+  #power{justify-content:flex-start;padding-top:8vh}
+  #power.ask{justify-content:center;padding-top:0}
   .pw-lcd{margin-bottom:14px;padding:14px 12px 8px}
   #power svg{width:92vw;margin:0}
   #power .pw-usb{transform:translate(400px,331px) rotate(90deg) translate(-532px,-195px)}
@@ -614,7 +615,15 @@ body:has(#power){overflow:hidden}
 #power .pw-lcd.done .pw-scr{animation:lcdOk .5s ease}
 @keyframes lcdOk{40%{filter:brightness(1.25)}}
 #power{gap:0}
-#power svg{max-height:62vh}
+#power svg{max-height:70vh}
+/* step 1 shows only the LCD, step 2 only the board */
+#power.ask{justify-content:center}
+#power.ask svg,#power.ask .pw-hint,#power:not(.ask) .pw-lcd{display:none}
+#power.ask .pw-lcd{width:min(470px,92vw);margin:0;animation:pwIn .5s ease backwards}
+#power:not(.ask) svg{animation:pwIn .6s ease backwards}
+@keyframes pwIn{from{opacity:0;transform:translateY(14px) scale(.97)}}
+.pw-lcd.shake{animation:pwShake .4s}
+@keyframes pwShake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 .pw-hint{margin-top:16px;font:500 13px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 .pw-hint::before{content:"\00a0"}
 #power.go .pw-hint::before{content:"Powering up";color:#a3e635}
@@ -684,7 +693,7 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
 </style>
 </head>
 <body>
-<div id="power">
+<div id="power" class="ask">
   <form class="pw-lcd" id="pwLcd" autocomplete="off" onsubmit="return false">
     <i class="hl a"></i><i class="hl b"></i><i class="hl c"></i><i class="hl d"></i>
     <span class="pw-pins" aria-hidden="true"></span>
@@ -1941,13 +1950,12 @@ addEventListener("resize", jrProgress);
     try{ n ? localStorage.setItem("visName", n) : localStorage.removeItem("visName"); }catch(e){}
     return n;
   };
+  /* step 1: only the LCD is shown; a name is needed to move on to the board */
   lcd.addEventListener("submit", () => {
     const n = saveName();
-    lcd1.textContent = n ? "HELLO," : "ENTER YOUR NAME:";
-    if(!n){ nameIn.focus(); return; }
-    lcd.classList.add("done"); nameIn.blur();
-    lcd1.textContent = "HELLO,"; setTimeout(() => { if(!done) lcd1.textContent = "PLUG THE CABLE"; }, 1400);
-    plug.focus({preventScroll: true});
+    if(!n){ lcd1.textContent = "NAME PLEASE :)"; lcd.classList.remove("shake"); void lcd.offsetWidth; lcd.classList.add("shake"); nameIn.focus(); return; }
+    lcd.classList.add("done"); nameIn.blur(); lcd1.textContent = "HELLO,";
+    setTimeout(() => { pw.classList.remove("ask"); plug.focus({preventScroll: true}); }, 650);   /* step 2: the board */
   });
   nameIn.addEventListener("input", () => { lcd.classList.remove("done"); lcd1.textContent = "ENTER YOUR NAME:"; });
   const vert = () => matchMedia("(max-width: 760px)").matches;   /* phones: port on the bottom edge, plug moves up */
@@ -2022,8 +2030,7 @@ addEventListener("resize", jrProgress);
   plug.addEventListener("pointerup", up);
   plug.addEventListener("pointercancel", up);
   plug.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); plugIn(); } });
-  if(matchMedia("(hover: hover) and (pointer: fine)").matches && !nameIn.value) nameIn.focus({preventScroll: true});
-  else plug.focus({preventScroll: true});
+  if(matchMedia("(hover: hover) and (pointer: fine)").matches) nameIn.focus({preventScroll: true});
 })();
 
 /* ---------- drone cursor ----------
