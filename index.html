@@ -658,16 +658,37 @@ html.drone-touch #drone:not(.show){opacity:0}
 @media(prefers-reduced-motion:reduce){#drone .bl,#drone .led,#drone svg{animation:none}}
 
 /* ---------- light theme ---------- */
-html[data-theme="light"]{--bg:#f3f6fb;--panel:#ffffff;--panel2:#f7f9fd;--line:#dde4ef;--line2:#c6d1e2;--copper:#3a5fae;--neon:#2563eb;--amber:#65a30d;--text:#111827;--mute:#5b6678;color-scheme:light}
-html[data-theme="light"] body{background-image:radial-gradient(circle at 1px 1px,rgba(37,99,235,.10) 1px,transparent 1.5px)}
-html[data-theme="light"] #bgc{opacity:.3}
-html[data-theme="light"] .nav{background:rgba(243,246,251,.85)}
-html[data-theme="light"] h1{color:var(--text)}
-html[data-theme="light"] .nm-txt{background-image:linear-gradient(100deg,#111827 0%,#111827 38%,#2563eb 50%,#111827 62%,#111827 100%);filter:none}
-html[data-theme="light"] :is(.tagline,.about-text,.extra p,.prj-info p,.jr-chip p,.dlist){color:#3b4658}
-html[data-theme="light"] .pt{background:#fff}
-html[data-theme="light"] .pr.nc .pt{background:#eef2f7}
-html[data-theme="light"] .card{box-shadow:0 6px 18px rgba(17,24,39,.06)}
+html[data-theme="light"]{--bg:#f8fafc;--panel:#ffffff;--panel2:#ffffff;--line:#e2e8f0;--line2:#cbd5e1;--copper:#1d4ed8;--neon:#2563eb;--amber:#16a34a;--text:#0f172a;--mute:#475569;color-scheme:light}
+/* bright, airy page: soft blue/cyan glows + a faint dot grid */
+html[data-theme="light"] body{background:
+  radial-gradient(1100px 620px at 8% -8%,rgba(59,130,246,.16),transparent 60%),
+  radial-gradient(900px 560px at 100% 18%,rgba(6,182,212,.12),transparent 60%),
+  radial-gradient(800px 600px at 50% 110%,rgba(99,102,241,.10),transparent 60%),
+  radial-gradient(circle at 1px 1px,rgba(37,99,235,.13) 1px,transparent 1.5px) 0 0/22px 22px,
+  #f8fafc;background-attachment:fixed}
+/* circuit-trace canvas: flip its colours so pads read light, traces stay blue */
+html[data-theme="light"] #bgc{opacity:.5;filter:invert(1) hue-rotate(180deg) saturate(1.4)}
+html[data-theme="light"] .nav{background:rgba(255,255,255,.78);border-bottom-color:rgba(148,163,184,.35);box-shadow:0 4px 20px rgba(15,23,42,.06)}
+html[data-theme="light"] h1,html[data-theme="light"] h2,html[data-theme="light"] h3{color:var(--text)}
+html[data-theme="light"] .nm-txt{background-image:linear-gradient(100deg,#0f172a 0%,#1e3a8a 30%,#2563eb 50%,#1e3a8a 70%,#0f172a 100%);filter:drop-shadow(0 6px 18px rgba(37,99,235,.18))}
+html[data-theme="light"] :is(.tagline,.about-text,.extra p,.prj-info p,.jr-chip p,.dlist){color:#334155}
+html[data-theme="light"] .pt{background:#fff;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+html[data-theme="light"] .pr.nc .pt{background:#f1f5f9}
+html[data-theme="light"] .card,html[data-theme="light"] .jr-chip,html[data-theme="light"] .prj{background:#fff;border-color:#e2e8f0;box-shadow:0 1px 2px rgba(15,23,42,.05),0 10px 28px rgba(15,23,42,.07)}
+html[data-theme="light"] .card:hover,html[data-theme="light"] .jr-chip:hover,html[data-theme="light"] .prj:hover{box-shadow:0 2px 4px rgba(15,23,42,.06),0 16px 36px rgba(37,99,235,.14)}
+html[data-theme="light"] .stat b{color:#2563eb}
+html[data-theme="light"] .sec-head .wire{background:linear-gradient(90deg,#93c5fd,transparent)}
+html[data-theme="light"] .jr-row.lit .jr-chip{border-color:#93c5fd}
+html[data-theme="light"] .jr-chip::before,html[data-theme="light"] .jr-chip::after{background:repeating-linear-gradient(90deg,#94a3b8 0 6px,transparent 6px 16px)}
+html[data-theme="light"] .jr-row.lit .jr-via{background:#ecfdf5;box-shadow:0 0 0 5px rgba(22,163,74,.12),0 0 14px rgba(22,163,74,.35)}
+html[data-theme="light"] .filters button{background:#fff}
+html[data-theme="light"] .filters button.on{background:#2563eb;color:#fff;border-color:#2563eb}
+html[data-theme="light"] .roll::before{background:linear-gradient(90deg,#f8fafc,transparent)}
+html[data-theme="light"] .roll::after{background:linear-gradient(270deg,#f8fafc,transparent)}
+html[data-theme="light"] .rb{background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.12)}
+html[data-theme="light"] .rb:hover{background:var(--neon)}
+html[data-theme="light"] .gal figure{box-shadow:0 8px 22px rgba(15,23,42,.12);border-color:#e2e8f0}
+html[data-theme="light"] ::selection{background:#bfdbfe}
 /* "hardware" stays dark in both themes: chips, the I/O panel, device mockups, photo frames, pop-ups, intro board */
 html[data-theme="light"] :is(.pchip,.io,.phn,.mon,.prj-media,.ov,#power,.chipframe,.lk .back,.adm,#fab){--bg:#050608;--panel:#0b0e14;--panel2:#111620;--line:#1c2433;--line2:#2a3a55;--copper:#6b8fd6;--neon:#3b82f6;--amber:#a3e635;--text:#e8edf5;--mute:#8a96ab;color:var(--text)}
 html[data-theme="light"] .lk .back{color:var(--copper);background:#0b0e14}
