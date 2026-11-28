@@ -1190,7 +1190,26 @@ function igUser(v){
 const img = (v, label) => (v && /^(data:image\/|https?:\/\/|[\w][\w .\/-]*$)/i.test(v)) ? v : ph(label || "add image");
 const icon = k => `<svg viewBox="0 0 24 24">${ICONS[k] || ICONS.bolt}</svg>`;
 function cyrb(s, seed){let a=0xdeadbeef^seed,b=0x41c6ce57^seed;for(let i=0,ch;i<s.length;i++){ch=s.charCodeAt(i);a=Math.imul(a^ch,2654435761);b=Math.imul(b^ch,1597334677)}a=Math.imul(a^(a>>>16),2246822507);a^=Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507);b^=Math.imul(a^(a>>>13),3266489909);return (4294967296*(2097151&b)+(a>>>0)).toString(16)}
-const hash = p => cyrb(p, 7) + "." + cyrb(p, 1729);
+const hash = p => cyrb(p, 7) + "." + cyrb(p, 1729);   /* old, fast fingerprint: only kept to recognise existing passwords once */
+/* Strong form: PBKDF2-SHA256, 600,000 rounds, random salt per password -> "p2$rounds$salt$hash".
+   Guessing against the public data.json then costs ~half a second per try instead of nanoseconds. */
+const P2_ROUNDS = 600000;
+const b64 = u => btoa(String.fromCharCode(...u)), unb64 = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
+async function slowHash(p, salt, rounds = P2_ROUNDS){
+  salt = salt || crypto.getRandomValues(new Uint8Array(16));
+  const k = await crypto.subtle.importKey("raw", new TextEncoder().encode(p), "PBKDF2", false, ["deriveBits"]);
+  const bits = new Uint8Array(await crypto.subtle.deriveBits({name: "PBKDF2", hash: "SHA-256", salt, iterations: rounds}, k, 256));
+  return `p2$${rounds}$${b64(salt)}$${b64(bits)}`;
+}
+const isStrong = h => /^p2\$/.test(h || "");
+async function hashMatches(p, stored){
+  if(!stored) return false;
+  if(!isStrong(stored)) return hash(p) === stored;
+  const [, rounds, salt] = stored.split("$");
+  const got = await slowHash(p, unb64(salt), +rounds);
+  let d = got.length ^ stored.length; for(let i = 0; i < Math.min(got.length, stored.length); i++) d |= got.charCodeAt(i) ^ stored.charCodeAt(i);
+  return d === 0;
+}
 
 /* ---------- storage (IndexedDB, so photos fit) ---------- */
 function idb(){return new Promise((res, rej) => {const r = indexedDB.open("eee-portfolio", 1);
@@ -1596,7 +1615,8 @@ $("#logo").addEventListener("click", () => {
    ignoring capitals and extra spaces. Wrong answers count toward the same 5-try lockout. */
 let gateStep = 1;
 const secNorm = a => String(a || "").trim().toLowerCase().replace(/\s+/g, " ");
-const secHashOf = a => hash("sq:" + secNorm(a));
+const secHashOf = a => hash("sq:" + secNorm(a));          /* old form */
+const secSlow = a => slowHash("sq:" + secNorm(a));
 function gateReset(){
   gateStep = 1; $("#gateMsg").textContent = ""; $("#gatePw").value = ""; $("#gateAns").value = "";
   $("#gatePw").hidden = false; $("#gateQ").hidden = true; $("#gateBtn").textContent = "Unlock"; $("#gateSub").textContent = "Enter the password to edit this site";
@@ -1607,18 +1627,27 @@ function gateFail(text){
   const f = $("#gateForm"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake");
 }
 function gateOpen(){ fails = 0; sessionStorage.setItem("adm", "1"); document.body.classList.add("unlocked"); $("#gate").classList.remove("open"); gateReset(); openAdmin(); }
-$("#gateForm").addEventListener("submit", e => {
+let gateBusy = false;
+$("#gateForm").addEventListener("submit", async e => {
   e.preventDefault();
   const msg = $("#gateMsg");
+  if(gateBusy) return;
   if(Date.now() < lockUntil){ msg.textContent = `LOCKED · retry in ${Math.ceil((lockUntil - Date.now()) / 1000)}s`; return; }
+  const btn = $("#gateBtn"), label = btn.textContent;
+  const check = async (v, stored) => { gateBusy = true; btn.textContent = "Checking…"; try{ return await hashMatches(v, stored); }catch(err){ return false; } finally{ gateBusy = false; btn.textContent = label; } };
   if(gateStep === 1){
-    if(hash($("#gatePw").value) !== state.passHash){ $("#gatePw").value = ""; gateFail("Wrong password"); return; }
+    const pv = $("#gatePw").value;
+    if(!(await check(pv, state.passHash))){ $("#gatePw").value = ""; gateFail("Wrong password"); return; }
+    /* still the old fast fingerprint: upgrade it now (saved in this browser; goes live with the next Publish) */
+    if(!isStrong(state.passHash)) try{ state.passHash = await slowHash(pv); changed(); }catch(err){}
     if(!(state.secQ && state.secHash)){ gateOpen(); return; }
     gateStep = 2; msg.textContent = ""; $("#gatePw").value = ""; $("#gatePw").hidden = true;
     $("#gateQText").textContent = state.secQ; $("#gateQ").hidden = false; $("#gateBtn").textContent = "Verify"; $("#gateSub").textContent = "Password correct · one more step";
     setTimeout(() => $("#gateAns").focus(), 30); return;
   }
-  if(secHashOf($("#gateAns").value) === state.secHash) gateOpen();
+  const av = $("#gateAns").value;
+  const ok = isStrong(state.secHash) ? await check("sq:" + secNorm(av), state.secHash) : secHashOf(av) === state.secHash;
+  if(ok){ if(!isStrong(state.secHash)) try{ state.secHash = await secSlow(av); changed(); }catch(err){} gateOpen(); }
   else { $("#gateAns").value = ""; gateFail("Wrong answer"); }
 });
 /* ---------- publish to GitHub (Git Data API) ----------
@@ -1824,6 +1853,7 @@ function renderTab(){
       <hr><h4>Backup</h4>
       <div class="rowb"><button class="btn sm" data-act="export">Export data.json</button><label class="btn sm" style="margin:0">Import<input type="file" accept="application/json,.json" id="imp" hidden></label></div>
       <hr><h4>Change password</h4>
+      <p class="hint">Your password is stored only as a slow, salted fingerprint (PBKDF2), so it can't be read back from the site's files. Pick one you use <b>nowhere else</b>, at least 12 characters — e.g. three or four random words.</p>
       <label>New password<input type="password" id="np" autocomplete="new-password"></label>
       <label>Repeat<input type="password" id="np2" autocomplete="new-password"></label>
       <div class="rowb"><button class="btn sm" data-act="pw">Update password</button></div>
@@ -1929,7 +1959,8 @@ adm.addEventListener("click", e => {
   else if(act === "sqsave"){ const q = ($("#sqQ").value || "").trim(), a = secNorm($("#sqA").value);
     if(q.length < 5){ $("#sqMsg").textContent = "Write a question (at least 5 characters)."; return; }
     if(a.length < 2){ $("#sqMsg").textContent = "Type the answer (at least 2 characters)."; return; }
-    state.secQ = q; state.secHash = secHashOf(a); changed(); renderTab(); $("#sqMsg").textContent = "Security question saved ✓ Press Publish so it applies on every device."; return; }
+    $("#sqMsg").textContent = "Saving…";
+    secSlow(a).then(h => { state.secQ = q; state.secHash = h; changed(); renderTab(); $("#sqMsg").textContent = "Security question saved ✓ Press Publish so it applies on every device."; }); return; }
   else if(act === "sqdel"){ if(!confirm("Remove the security question? Unlocking will need only the password.")) return;
     state.secQ = ""; state.secHash = ""; changed(); renderTab(); $("#sqMsg").textContent = "Security question removed. Press Publish to apply it everywhere."; return; }
   else if(act === "ghsave"){ const v = ($("#ghTok").value || "").trim(), rp = ($("#ghRepo").value || "").trim();
@@ -1946,8 +1977,11 @@ adm.addEventListener("click", e => {
   else if(act === "ghforget"){ lsSet("ghTok", ""); renderTab(); pubMsg("Token removed from this device."); return; }
   else if(act === "publish"){ if($("#ghRepo")) lsSet("ghRepo", ($("#ghRepo").value || "").trim() || ghRepo()); publish(); return; }
   else if(act === "export"){ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(state)], {type: "application/json"})); a.download = "data.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); return; }
-  else if(act === "pw"){ const a = $("#np").value, m = $("#pwMsg"); if(a.length < 6){ m.textContent = "Use at least 6 characters."; return; } if(a !== $("#np2").value){ m.textContent = "Passwords do not match."; return; }
-    state.passHash = hash(a); $("#np").value = $("#np2").value = ""; m.textContent = "Password updated ✓ (export data.json to carry it to your host)"; changed(); return; }
+  else if(act === "pw"){ const a = $("#np").value, m = $("#pwMsg");
+    if(a.length < 10){ m.textContent = "Use at least 10 characters (a few random words works well)."; return; }
+    if(a !== $("#np2").value){ m.textContent = "Passwords do not match."; return; }
+    m.textContent = "Saving…";
+    slowHash(a).then(h => { state.passHash = h; $("#np").value = $("#np2").value = ""; changed(); renderTab(); $("#pwMsg").textContent = "Password updated ✓ Press Publish so it applies on every device."; }); return; }
   else if(act === "lock"){ sessionStorage.removeItem("adm"); document.body.classList.remove("unlocked", "adm-open"); return; }
   else if(act === "reset"){ if(!confirm("Erase all your edits in this browser and restore the defaults? This cannot be undone.")) return; const keep = state.passHash; dbDel("data").then(async () => { await load(); state.passHash = state.passHash === DEFAULT_HASH ? keep : state.passHash; render(); renderTab(); $("#status").textContent = "reset"; }); return; }
   else return;
