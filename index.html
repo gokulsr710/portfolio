@@ -565,7 +565,8 @@ body:has(#power){overflow:hidden}
 #power.on .pw-vc text{display:inline}
 @media(max-width:760px){
   /* phones: the USB-C port moves to the bottom edge of the board and the cable hangs straight down */
-  #power{justify-content:flex-start;padding-top:12vh}
+  #power{justify-content:flex-start;padding-top:5vh}
+  .pw-lcd{margin-bottom:14px;padding:14px 12px 8px}
   #power svg{width:92vw;margin:0}
   #power .pw-usb{transform:translate(400px,331px) rotate(90deg) translate(-532px,-195px)}
   #power .pw-rpads{display:none}
@@ -595,6 +596,25 @@ body:has(#power){overflow:hidden}
 .pw-wb{animation:wb .6s steps(1) infinite}
 @keyframes wa{50%{opacity:0}}
 @keyframes wb{0%{opacity:0}50%{opacity:1}}
+/* 16x2 character LCD that asks for the visitor's name */
+.pw-lcd{position:relative;width:min(400px,90vw);margin:0 0 20px;padding:16px 16px 10px;border-radius:7px;background:linear-gradient(160deg,#17703a,#0d4f27);box-shadow:0 14px 30px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);transition:opacity .5s}
+.pw-lcd .hl{position:absolute;width:9px;height:9px;border-radius:50%;background:#050608;box-shadow:0 0 0 2.5px #c9a046}
+.pw-lcd .hl.a{left:7px;top:7px}.pw-lcd .hl.b{right:7px;top:7px}.pw-lcd .hl.c{left:7px;bottom:7px}.pw-lcd .hl.d{right:7px;bottom:7px}
+.pw-pins{position:absolute;left:34px;top:3px;width:128px;height:7px;background:radial-gradient(circle,#050608 1.6px,#c9a046 2.2px,#c9a046 3px,transparent 3.4px) 0 0/8px 7px repeat-x}
+.pw-bz{background:#0a0b0d;border-radius:4px;padding:9px;box-shadow:inset 0 0 0 1px #2a2f36}
+.pw-scr{background:linear-gradient(180deg,#b9e05a,#94c43a);border-radius:2px;padding:7px 10px;box-shadow:inset 0 0 14px rgba(0,0,0,.35);font:700 clamp(15px,4.4vw,19px)/1.35 var(--mono);letter-spacing:.14em;color:#17300a;text-transform:uppercase;text-shadow:1px 1px 0 rgba(23,48,10,.18)}
+.pw-row{display:flex;align-items:center;white-space:nowrap;overflow:hidden;min-height:1.35em}
+.pw-gt{margin-right:.4em}
+#pwName{flex:1;min-width:0;padding:0;border:0;outline:0;background:none;font:inherit;letter-spacing:inherit;color:inherit;text-transform:uppercase;caret-color:#17300a;user-select:text;-webkit-user-select:text}
+#pwName::placeholder{color:#17300a;opacity:.7;animation:jrBlink 1s steps(1) infinite}
+.pw-lcdfoot{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font:600 10px var(--mono);letter-spacing:.14em;color:rgba(238,245,238,.75)}
+#pwOk{font:700 11px var(--mono);letter-spacing:.12em;padding:5px 12px;border-radius:5px;border:0;color:#0b0c0e;background:linear-gradient(180deg,#f3f5f8,#aab1ba);box-shadow:0 2px 0 #5d646c,0 3px 6px rgba(0,0,0,.4);cursor:pointer}
+#pwOk:active{transform:translateY(2px);box-shadow:0 0 0 #5d646c}
+#power .pw-lcd.done #pwOk{display:none}
+#power .pw-lcd.done .pw-scr{animation:lcdOk .5s ease}
+@keyframes lcdOk{40%{filter:brightness(1.25)}}
+#power{gap:0}
+#power svg{max-height:62vh}
 .pw-hint{margin-top:16px;font:500 13px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 .pw-hint::before{content:"\00a0"}
 #power.go .pw-hint::before{content:"Powering up";color:#a3e635}
@@ -665,6 +685,15 @@ html[data-theme="light"] .thm .sun{stroke:#fbbf24;filter:drop-shadow(0 0 3px #fb
 </head>
 <body>
 <div id="power">
+  <form class="pw-lcd" id="pwLcd" autocomplete="off" onsubmit="return false">
+    <i class="hl a"></i><i class="hl b"></i><i class="hl c"></i><i class="hl d"></i>
+    <span class="pw-pins" aria-hidden="true"></span>
+    <div class="pw-bz"><div class="pw-scr">
+      <div class="pw-row" id="pwLcd1">ENTER YOUR NAME:</div>
+      <div class="pw-row"><span class="pw-gt" aria-hidden="true">&gt;</span><input id="pwName" maxlength="15" spellcheck="false" autocapitalize="characters" enterkeyhint="done" aria-label="Your name" placeholder="_"></div>
+    </div></div>
+    <div class="pw-lcdfoot"><span>LCD1602 · I²C</span><button type="submit" id="pwOk">OK ⏎</button></div>
+  </form>
   <svg viewBox="0 0 560 360">
     <defs>
       <linearGradient id="pwMask" x1="0" y1="0" x2="1" y2="1">
@@ -1902,6 +1931,25 @@ addEventListener("resize", jrProgress);
   const pw = $("#power"); if(!pw) return;
   const plug = $("#pwPlug"), svg = $("svg", pw), L1 = $("#pwL1"), L2 = $("#pwL2"), L3 = $("#pwL3"), GAP = 64;
   let done = false, x0 = null, off = 0;
+
+  /* name typed on the LCD: kept only in this browser, never sent anywhere */
+  const nameIn = $("#pwName"), lcd = $("#pwLcd"), lcd1 = $("#pwLcd1");
+  const clean = v => String(v || "").replace(/[^\p{L}\p{N} .'-]/gu, "").replace(/\s+/g, " ").trim().toUpperCase().slice(0, 15);
+  try{ const v = localStorage.getItem("visName"); if(v) nameIn.value = clean(v); }catch(e){}
+  const saveName = () => {
+    const n = clean(nameIn.value); nameIn.value = n;
+    try{ n ? localStorage.setItem("visName", n) : localStorage.removeItem("visName"); }catch(e){}
+    return n;
+  };
+  lcd.addEventListener("submit", () => {
+    const n = saveName();
+    lcd1.textContent = n ? "HELLO," : "ENTER YOUR NAME:";
+    if(!n){ nameIn.focus(); return; }
+    lcd.classList.add("done"); nameIn.blur();
+    lcd1.textContent = "HELLO,"; setTimeout(() => { if(!done) lcd1.textContent = "PLUG THE CABLE"; }, 1400);
+    plug.focus({preventScroll: true});
+  });
+  nameIn.addEventListener("input", () => { lcd.classList.remove("done"); lcd1.textContent = "ENTER YOUR NAME:"; });
   const vert = () => matchMedia("(max-width: 760px)").matches;   /* phones: port on the bottom edge, plug moves up */
 
   /* Visitor counter (free hitscounter.dev API, fast and CORS-enabled).
@@ -1931,13 +1979,20 @@ addEventListener("resize", jrProgress);
   }
 
   const power = () => {
+    nameIn.readOnly = true; lcd.classList.add("done");
+    lcd1.textContent = nameIn.value ? "HELLO," : "POWER ON";
     setTimeout(() => { powered = true; showVisits(); }, 250);
     pw.classList.add("on", "go");
     L1.textContent = "BOOTING"; L2.textContent = ""; L3.textContent = "";
     const fill = $("#pwFill"), t0 = performance.now();
     const grow = now => { const k = Math.min(1, (now - t0) / 900); fill.setAttribute("width", (146 * (1 - Math.pow(1 - k, 2))).toFixed(1)); if(k < 1) requestAnimationFrame(grow); };
     requestAnimationFrame(grow);
-    setTimeout(() => { pw.classList.add("hi"); L1.textContent = "HI THERE!"; L2.textContent = "WELCOME"; }, 1050);
+    const who = saveName();
+    setTimeout(() => {
+      pw.classList.add("hi");
+      if(who){ L1.textContent = "HI,"; L2.textContent = who.slice(0, 10); L3.textContent = "WELCOME!"; }
+      else { L1.textContent = "HI THERE!"; L2.textContent = "WELCOME"; }
+    }, 1050);
     setTimeout(() => { pw.classList.add("gone"); setTimeout(() => pw.remove(), 850); }, 3200);
   };
   const plugIn = () => {
@@ -1967,7 +2022,8 @@ addEventListener("resize", jrProgress);
   plug.addEventListener("pointerup", up);
   plug.addEventListener("pointercancel", up);
   plug.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); plugIn(); } });
-  plug.focus({preventScroll: true});
+  if(matchMedia("(hover: hover) and (pointer: fine)").matches && !nameIn.value) nameIn.focus({preventScroll: true});
+  else plug.focus({preventScroll: true});
 })();
 
 /* ---------- drone cursor ----------
